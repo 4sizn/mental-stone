@@ -48,7 +48,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       body: Stack(
         children: [
-          const MeshBackground(),
+          const EtherealBackground(variant: AuraVariant.home),
           ListView(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.marginPage,
@@ -79,8 +79,22 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: AppSpacing.stackMd),
+              const _StoneCaption(),
               const SizedBox(height: AppSpacing.stackLg),
-              Text('Recent Records', style: AppTextStyles.headlineMedium),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('Recent Records', style: AppTextStyles.headlineMedium),
+                  Text(
+                    'View All',
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.primaryFixedDim,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: AppSpacing.stackMd),
               ...recent,
             ],
@@ -217,6 +231,44 @@ class _MessageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       GlassCard(child: Text(text, style: AppTextStyles.bodyMedium));
+}
+
+class _StoneCaption extends StatelessWidget {
+  const _StoneCaption();
+  @override
+  Widget build(BuildContext context) {
+    final base = AppTextStyles.bodyMedium;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 280),
+        child: Text.rich(
+          TextSpan(
+            text: 'Your stone is glowing with a mixture of ',
+            style: base,
+            children: [
+              TextSpan(
+                text: 'Hope',
+                style: base.copyWith(
+                  color: AppColors.tertiary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              TextSpan(text: ' and ', style: base),
+              TextSpan(
+                text: 'Calm',
+                style: base.copyWith(
+                  color: AppColors.secondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              TextSpan(text: '.', style: base),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
 }
 
 class _DateStrip extends StatelessWidget {

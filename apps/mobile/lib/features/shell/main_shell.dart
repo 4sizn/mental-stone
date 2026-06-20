@@ -26,6 +26,7 @@ class _MainShellState extends State<MainShell> {
       extendBody: true,
       backgroundColor: Colors.transparent,
       body: Stack(
+        fit: StackFit.expand,
         children: [
           IndexedStack(
             index: index,
@@ -35,8 +36,10 @@ class _MainShellState extends State<MainShell> {
               RecordsScreen(showBottomNav: false),
             ],
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
             child: GlassBottomNav(
               active: _active,
               onChanged: (item) => setState(() => _active = item),
@@ -67,7 +70,7 @@ class _CalendarPlaceholder extends StatelessWidget {
       appBar: MentalStoneAppBar(onLeading: () => context.push(Routes.profile)),
       body: Stack(
         children: [
-          const MeshBackground(),
+          const EtherealBackground(variant: AuraVariant.home),
           Center(child: Text('Calendar', style: AppTextStyles.headlineMedium)),
         ],
       ),

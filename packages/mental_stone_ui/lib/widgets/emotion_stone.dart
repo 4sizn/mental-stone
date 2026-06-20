@@ -2,15 +2,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-/// The signature "emotion stone": a 1:1 crystalline vessel with an organic
-/// (squircle) outline, a curved-glass radial highlight, glowing inner blobs
-/// and a slow vertical float.
+/// The signature "emotion stone": a 1:1 crystalline vessel whose organic
+/// outline slowly **morphs** (CSS `@keyframes morph`, 12s), with a curved-glass
+/// radial highlight and glowing inner blobs.
 class EmotionStone extends StatefulWidget {
   const EmotionStone({
     super.key,
     this.size = 280,
     this.blobs = const [AppColors.tertiaryFixed, AppColors.secondaryFixed],
-    this.float = true,
+    this.float = false,
     this.child,
   });
 
@@ -18,6 +18,8 @@ class EmotionStone extends StatefulWidget {
 
   /// 1–3 mood colors rendered as soft glowing blobs inside the glass.
   final List<Color> blobs;
+
+  /// Adds a gentle vertical float on top of the morph.
   final bool float;
   final Widget? child;
 
@@ -27,6 +29,7 @@ class EmotionStone extends StatefulWidget {
 
 class _EmotionStoneState extends State<EmotionStone>
     with SingleTickerProviderStateMixin {
+  // 6s each direction → a 12s morph cycle, matching the design.
   late final AnimationController _c = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 6),
@@ -38,27 +41,47 @@ class _EmotionStoneState extends State<EmotionStone>
     super.dispose();
   }
 
-  /// Organic outline approximating CSS `42% 58% 70% 30% / 45% 45% 55% 55%`.
-  BorderRadius _organic(double s) => BorderRadius.only(
+  // morph 0%  : 42% 58% 70% 30% / 45% 45% 55% 55%
+  BorderRadius _r0(double s) => BorderRadius.only(
     topLeft: Radius.elliptical(s * 0.42, s * 0.45),
     topRight: Radius.elliptical(s * 0.58, s * 0.45),
     bottomRight: Radius.elliptical(s * 0.70, s * 0.55),
     bottomLeft: Radius.elliptical(s * 0.30, s * 0.55),
   );
 
+  // morph 50% : 70% 30% 46% 54% / 30% 74% 26% 70%
+  BorderRadius _r1(double s) => BorderRadius.only(
+    topLeft: Radius.elliptical(s * 0.70, s * 0.30),
+    topRight: Radius.elliptical(s * 0.30, s * 0.74),
+    bottomRight: Radius.elliptical(s * 0.46, s * 0.26),
+    bottomLeft: Radius.elliptical(s * 0.54, s * 0.70),
+  );
+
   @override
   Widget build(BuildContext context) {
     final s = widget.size;
-    final radius = _organic(s);
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) {
+        final t = Curves.easeInOut.transform(_c.value);
+        final radius = BorderRadius.lerp(_r0(s), _r1(s), t)!;
+        final dy = widget.float ? -12 * t : 0.0;
+        return Transform.translate(
+          offset: Offset(0, dy),
+          child: _stone(s, radius),
+        );
+      },
+    );
+  }
 
-    final stone = ClipRRect(
+  Widget _stone(double s, BorderRadius radius) {
+    return ClipRRect(
       borderRadius: radius,
       child: Container(
         width: s,
         height: s,
         decoration: BoxDecoration(
           borderRadius: radius,
-          // Curved-glass highlight.
           gradient: const RadialGradient(
             center: Alignment(-0.4, -0.4),
             radius: 1.1,
@@ -81,7 +104,10 @@ class _EmotionStoneState extends State<EmotionStone>
                     ? const Alignment(-0.4, -0.6)
                     : const Alignment(0.5, 0.6),
                 child: ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                  imageFilter: ImageFilter.blur(
+                    sigmaX: s * 0.1,
+                    sigmaY: s * 0.1,
+                  ),
                   child: Container(
                     width: s * 0.5,
                     height: s * 0.5,
@@ -92,7 +118,7 @@ class _EmotionStoneState extends State<EmotionStone>
                   ),
                 ),
               ),
-            // Inner glass sheen.
+            // Inner glass sheen (approximates the inset highlight).
             DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: radius,
@@ -108,16 +134,6 @@ class _EmotionStoneState extends State<EmotionStone>
           ],
         ),
       ),
-    );
-
-    if (!widget.float) return stone;
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (_, child) => Transform.translate(
-        offset: Offset(0, -12 * Curves.easeInOut.transform(_c.value)),
-        child: child,
-      ),
-      child: stone,
     );
   }
 }

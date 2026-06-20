@@ -31,7 +31,7 @@ class MentalStoneAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
         child: Container(
           padding: EdgeInsets.fromLTRB(
             AppSpacing.marginPage,
@@ -44,6 +44,13 @@ class MentalStoneAppBar extends StatelessWidget implements PreferredSizeWidget {
             border: const Border(
               bottom: BorderSide(color: AppGlass.edge, width: 1),
             ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x1A000000),
+                blurRadius: 30,
+                offset: Offset(0, 4),
+              ),
+            ],
           ),
           child: SafeArea(
             bottom: false,

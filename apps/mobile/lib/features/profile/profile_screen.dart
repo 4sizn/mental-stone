@@ -32,7 +32,7 @@ class ProfileScreen extends ConsumerWidget {
       ),
       body: Stack(
         children: [
-          const MeshBackground(),
+          const EtherealBackground(variant: AuraVariant.home),
           ListView(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.marginPage,

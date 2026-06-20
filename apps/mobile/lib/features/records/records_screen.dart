@@ -28,7 +28,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
       appBar: MentalStoneAppBar(onLeading: () => context.push(Routes.profile)),
       body: Stack(
         children: [
-          const MeshBackground(),
+          const EtherealBackground(variant: AuraVariant.records),
           ListView(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.marginPage,

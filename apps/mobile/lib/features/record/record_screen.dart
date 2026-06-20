@@ -61,7 +61,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
       appBar: MentalStoneAppBar(back: true, onLeading: () => context.pop()),
       body: Stack(
         children: [
-          const MeshBackground(),
+          const EtherealBackground(variant: AuraVariant.record),
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.marginPage,

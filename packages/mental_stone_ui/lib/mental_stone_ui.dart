@@ -12,6 +12,7 @@ export 'theme/app_dimens.dart';
 export 'theme/app_theme.dart';
 
 // Components
+export 'widgets/ethereal_background.dart';
 export 'widgets/glass_card.dart';
 export 'widgets/glass_button.dart';
 export 'widgets/glass_input.dart';

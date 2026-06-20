@@ -51,7 +51,7 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
       appBar: MentalStoneAppBar(back: true, onLeading: () => context.pop()),
       body: Stack(
         children: [
-          const MeshBackground(),
+          const EtherealBackground(variant: AuraVariant.analysis),
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(

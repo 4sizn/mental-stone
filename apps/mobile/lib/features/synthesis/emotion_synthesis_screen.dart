@@ -18,7 +18,7 @@ class EmotionSynthesisScreen extends StatelessWidget {
       appBar: MentalStoneAppBar(back: true, onLeading: () => context.pop()),
       body: Stack(
         children: [
-          const MeshBackground(animate: true),
+          const EtherealBackground(variant: AuraVariant.synthesis),
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(

@@ -14,7 +14,7 @@ class AuthScaffold extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          const MeshBackground(animate: true),
+          const EtherealBackground(variant: AuraVariant.synthesis),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(

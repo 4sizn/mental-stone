@@ -22,8 +22,9 @@ Future<void> pumpFor(
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('sign up → home → profile → record → analysis walkthrough',
-      (tester) async {
+  testWidgets('sign up → home → profile → record → analysis walkthrough', (
+    tester,
+  ) async {
     await Supabase.initialize(
       url: Env.supabaseUrl,
       publishableKey: Env.supabaseKey,
@@ -67,7 +68,9 @@ void main() {
     await tester.tap(find.byIcon(Icons.add));
     await pumpFor(tester, const Duration(seconds: 1));
     await tester.enterText(
-        find.byType(TextField).first, '오늘은 마음이 차분하고 맑은 하루였다.');
+      find.byType(TextField).first,
+      '오늘은 마음이 차분하고 맑은 하루였다.',
+    );
     await pumpFor(tester, const Duration(milliseconds: 600));
     await binding.takeScreenshot('06-record');
 
