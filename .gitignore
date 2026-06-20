@@ -47,6 +47,9 @@ apps/mobile/env.json
 .DS_Store
 *.log
 
+# ─── Integration-test screenshot output ──────────────────────
+**/screenshots/
+
 # ─── Tooling state (not part of the app) ─────────────────────
 .omc/
 .agents/

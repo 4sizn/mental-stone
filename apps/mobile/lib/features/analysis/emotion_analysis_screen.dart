@@ -53,7 +53,7 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
         children: [
           const MeshBackground(),
           SafeArea(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.marginPage,
                 96,
@@ -61,7 +61,6 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
                 120,
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _AnalysisStone(charged: _done),
                   const SizedBox(height: AppSpacing.stackLg),

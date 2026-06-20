@@ -42,7 +42,49 @@ class GlassInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasError = errorText != null && errorText!.isNotEmpty;
+    final field = ClipRRect(
+      borderRadius: AppRadii.rXxl,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: AppGlass.opacityInput),
+            borderRadius: AppRadii.rXxl,
+            border: Border.all(
+              color: hasError
+                  ? AppColors.error.withValues(alpha: 0.6)
+                  : Colors.white.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          padding: const EdgeInsets.all(AppSpacing.glassPadding),
+          child: TextField(
+            controller: controller,
+            maxLines: expands ? null : maxLines,
+            minLines: minLines,
+            expands: expands,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            autofillHints: autofillHints,
+            enabled: enabled,
+            onChanged: onChanged,
+            onSubmitted: onSubmitted,
+            cursorColor: AppColors.primary,
+            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface),
+            decoration: InputDecoration.collapsed(
+              hintText: hintText,
+              hintStyle: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
     return Column(
+      mainAxisSize: expands ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
@@ -54,48 +96,9 @@ class GlassInput extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.stackSm),
         ],
-        ClipRRect(
-          borderRadius: AppRadii.rXxl,
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: AppGlass.opacityInput),
-                borderRadius: AppRadii.rXxl,
-                border: Border.all(
-                  color: hasError
-                      ? AppColors.error.withValues(alpha: 0.6)
-                      : Colors.white.withValues(alpha: 0.2),
-                  width: 1,
-                ),
-              ),
-              padding: const EdgeInsets.all(AppSpacing.glassPadding),
-              child: TextField(
-                controller: controller,
-                maxLines: expands ? null : maxLines,
-                minLines: minLines,
-                expands: expands,
-                obscureText: obscureText,
-                keyboardType: keyboardType,
-                textInputAction: textInputAction,
-                autofillHints: autofillHints,
-                enabled: enabled,
-                onChanged: onChanged,
-                onSubmitted: onSubmitted,
-                cursorColor: AppColors.primary,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.onSurface,
-                ),
-                decoration: InputDecoration.collapsed(
-                  hintText: hintText,
-                  hintStyle: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        // When [expands] the field must fill bounded height (caller wraps the
+        // GlassInput in Expanded); otherwise it sizes to its content.
+        if (expands) Expanded(child: field) else field,
         if (hasError) ...[
           const SizedBox(height: 6),
           Padding(
