@@ -1,0 +1,52 @@
+# ─── Dart / Flutter ───────────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/.dart_tool/
+**/build/
+build/
+.packages
+**/doc/api/
+*.lock.bak
+
+# ─── Melos ────────────────────────────────────────────────────
+.melos_tool/
+pubspec_overrides.yaml
+**/pubspec_overrides.yaml
+
+# ─── Secrets / env ────────────────────────────────────────────
+apps/mobile/env.json
+**/*.env
+!**/env.example.json
+
+# ─── Native build ─────────────────────────────────────────────
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/ephemeral/
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/android/.gradle/
+**/android/captures/
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+**/*.keystore
+**/*.jks
+
+# ─── IDE ──────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+
+# ─── OS / misc ────────────────────────────────────────────────
+.DS_Store
+*.log
+
+# ─── Tooling state (not part of the app) ─────────────────────
+.omc/
+.agents/
