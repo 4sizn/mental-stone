@@ -25,7 +25,7 @@ class JournalEntry {
       body: map['body'] as String?,
       createdAt:
           DateTime.tryParse(map['created_at'] as String? ?? '') ??
-              DateTime.fromMillisecondsSinceEpoch(0),
+          DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 }

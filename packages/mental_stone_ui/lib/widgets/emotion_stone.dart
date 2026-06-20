@@ -40,11 +40,11 @@ class _EmotionStoneState extends State<EmotionStone>
 
   /// Organic outline approximating CSS `42% 58% 70% 30% / 45% 45% 55% 55%`.
   BorderRadius _organic(double s) => BorderRadius.only(
-        topLeft: Radius.elliptical(s * 0.42, s * 0.45),
-        topRight: Radius.elliptical(s * 0.58, s * 0.45),
-        bottomRight: Radius.elliptical(s * 0.70, s * 0.55),
-        bottomLeft: Radius.elliptical(s * 0.30, s * 0.55),
-      );
+    topLeft: Radius.elliptical(s * 0.42, s * 0.45),
+    topRight: Radius.elliptical(s * 0.58, s * 0.45),
+    bottomRight: Radius.elliptical(s * 0.70, s * 0.55),
+    bottomLeft: Radius.elliptical(s * 0.30, s * 0.55),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,11 @@ class _EmotionStoneState extends State<EmotionStone>
             colors: [Color(0x66FFFFFF), Color(0x1AFFFFFF)],
           ),
           boxShadow: const [
-            BoxShadow(color: Color(0x0D000000), blurRadius: 40, offset: Offset(0, 20)),
+            BoxShadow(
+              color: Color(0x0D000000),
+              blurRadius: 40,
+              offset: Offset(0, 20),
+            ),
           ],
         ),
         child: Stack(

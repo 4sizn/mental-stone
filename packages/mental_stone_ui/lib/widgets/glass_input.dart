@@ -46,9 +46,12 @@ class GlassInput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          Text(label!,
-              style: AppTextStyles.labelMedium
-                  .copyWith(color: AppColors.onSurfaceVariant)),
+          Text(
+            label!,
+            style: AppTextStyles.labelMedium.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: AppSpacing.stackSm),
         ],
         ClipRRect(
@@ -60,10 +63,11 @@ class GlassInput extends StatelessWidget {
                 color: Colors.white.withValues(alpha: AppGlass.opacityInput),
                 borderRadius: AppRadii.rXxl,
                 border: Border.all(
-                    color: hasError
-                        ? AppColors.error.withValues(alpha: 0.6)
-                        : Colors.white.withValues(alpha: 0.2),
-                    width: 1),
+                  color: hasError
+                      ? AppColors.error.withValues(alpha: 0.6)
+                      : Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
               ),
               padding: const EdgeInsets.all(AppSpacing.glassPadding),
               child: TextField(
@@ -79,12 +83,14 @@ class GlassInput extends StatelessWidget {
                 onChanged: onChanged,
                 onSubmitted: onSubmitted,
                 cursorColor: AppColors.primary,
-                style: AppTextStyles.bodyLarge
-                    .copyWith(color: AppColors.onSurface),
+                style: AppTextStyles.bodyLarge.copyWith(
+                  color: AppColors.onSurface,
+                ),
                 decoration: InputDecoration.collapsed(
                   hintText: hintText,
                   hintStyle: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.onSurfaceVariant.withValues(alpha: 0.5)),
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+                  ),
                 ),
               ),
             ),
@@ -94,9 +100,13 @@ class GlassInput extends StatelessWidget {
           const SizedBox(height: 6),
           Padding(
             padding: const EdgeInsets.only(left: 8),
-            child: Text(errorText!,
-                style: AppTextStyles.labelMedium
-                    .copyWith(color: AppColors.error, letterSpacing: 0)),
+            child: Text(
+              errorText!,
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.error,
+                letterSpacing: 0,
+              ),
+            ),
           ),
         ],
       ],

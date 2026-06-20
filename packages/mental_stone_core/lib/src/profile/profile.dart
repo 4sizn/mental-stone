@@ -18,10 +18,9 @@ class Profile {
   final DateTime? createdAt;
 
   /// Best label for the user in the UI.
-  String get name =>
-      (displayName?.trim().isNotEmpty ?? false)
-          ? displayName!.trim()
-          : (email?.split('@').first ?? 'Friend');
+  String get name => (displayName?.trim().isNotEmpty ?? false)
+      ? displayName!.trim()
+      : (email?.split('@').first ?? 'Friend');
 
   factory Profile.fromMap(Map<String, dynamic> map) {
     final created = map['created_at'];
@@ -35,12 +34,12 @@ class Profile {
   }
 
   Profile copyWith({String? displayName, String? avatarUrl}) => Profile(
-        id: id,
-        email: email,
-        displayName: displayName ?? this.displayName,
-        avatarUrl: avatarUrl ?? this.avatarUrl,
-        createdAt: createdAt,
-      );
+    id: id,
+    email: email,
+    displayName: displayName ?? this.displayName,
+    avatarUrl: avatarUrl ?? this.avatarUrl,
+    createdAt: createdAt,
+  );
 
   @override
   bool operator ==(Object other) =>

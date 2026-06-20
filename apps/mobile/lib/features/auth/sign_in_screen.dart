@@ -48,8 +48,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(authControllerProvider);
     final loading = state.isLoading;
-    final error = _localError ??
-        (state.hasError ? authErrorMessage(state.error!) : null);
+    final error =
+        _localError ?? (state.hasError ? authErrorMessage(state.error!) : null);
 
     return AuthScaffold(
       child: Column(
@@ -62,12 +62,17 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.stackLg),
-          Text('다시 오신 걸 환영해요',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.headlineLargeMobile),
+          Text(
+            '다시 오신 걸 환영해요',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.headlineLargeMobile,
+          ),
           const SizedBox(height: AppSpacing.stackSm),
-          Text('당신의 감정을 다시 만나보세요.',
-              textAlign: TextAlign.center, style: AppTextStyles.bodyMedium),
+          Text(
+            '당신의 감정을 다시 만나보세요.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium,
+          ),
           const SizedBox(height: AppSpacing.stackLg),
           GlassCard(
             child: Column(
@@ -94,13 +99,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   const SizedBox(height: AppSpacing.stackMd),
                   Row(
                     children: [
-                      const Icon(Icons.error_outline,
-                          color: AppColors.error, size: 18),
+                      const Icon(
+                        Icons.error_outline,
+                        color: AppColors.error,
+                        size: 18,
+                      ),
                       const SizedBox(width: 6),
                       Expanded(
-                        child: Text(error,
-                            style: AppTextStyles.labelMedium
-                                .copyWith(color: AppColors.error)),
+                        child: Text(
+                          error,
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: AppColors.error,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -129,8 +140,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   TextSpan(
                     text: '가입하기',
                     style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w700),
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),

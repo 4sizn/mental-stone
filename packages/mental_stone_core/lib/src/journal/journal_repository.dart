@@ -17,9 +17,7 @@ class JournalRepository {
         .select()
         .eq('user_id', userId)
         .order('created_at', ascending: false);
-    return rows
-        .map((e) => JournalEntry.fromMap(e))
-        .toList(growable: false);
+    return rows.map((e) => JournalEntry.fromMap(e)).toList(growable: false);
   }
 
   Future<JournalEntry> create({
@@ -29,11 +27,7 @@ class JournalRepository {
   }) async {
     final row = await _client
         .from('journal_entries')
-        .insert({
-          'user_id': userId,
-          'mood': mood,
-          'body': body,
-        })
+        .insert({'user_id': userId, 'mood': mood, 'body': body})
         .select()
         .single();
     return JournalEntry.fromMap(row);

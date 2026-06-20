@@ -48,17 +48,18 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: MentalStoneAppBar(
-        back: true,
-        onLeading: () => context.pop(),
-      ),
+      appBar: MentalStoneAppBar(back: true, onLeading: () => context.pop()),
       body: Stack(
         children: [
           const MeshBackground(),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.marginPage, 96, AppSpacing.marginPage, 120),
+                AppSpacing.marginPage,
+                96,
+                AppSpacing.marginPage,
+                120,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -81,8 +82,10 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
     return Column(
       key: const ValueKey('analyzing'),
       children: [
-        Text('AI 감정 분석 중 (${(_progress * 100).round()}%)',
-            style: AppTextStyles.headlineMedium),
+        Text(
+          'AI 감정 분석 중 (${(_progress * 100).round()}%)',
+          style: AppTextStyles.headlineMedium,
+        ),
         const SizedBox(height: AppSpacing.stackMd),
         ClipRRect(
           borderRadius: AppRadii.rPill,
@@ -107,9 +110,12 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
           ),
         ),
         const SizedBox(height: AppSpacing.stackMd),
-        Text('문장의 온도를 측정하고 있습니다...',
-            style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.onSurfaceVariant.withValues(alpha: 0.7))),
+        Text(
+          '문장의 온도를 측정하고 있습니다...',
+          style: AppTextStyles.labelMedium.copyWith(
+            color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+          ),
+        ),
       ],
     );
   }
@@ -127,18 +133,27 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('분석 결과',
-                      style: AppTextStyles.headlineLargeMobile
-                          .copyWith(color: AppColors.primary)),
+                  Text(
+                    '분석 결과',
+                    style: AppTextStyles.headlineLargeMobile.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
                   Text('오늘의 돌 조각', style: AppTextStyles.labelMedium),
                 ],
               ),
               const SizedBox(height: AppSpacing.stackMd),
               const GlowBar(
-                  label: '행복', value: 0.60, color: AppColors.moodClarity),
+                label: '행복',
+                value: 0.60,
+                color: AppColors.moodClarity,
+              ),
               const SizedBox(height: AppSpacing.stackMd),
               const GlowBar(
-                  label: '기대', value: 0.25, color: AppColors.moodVitality),
+                label: '기대',
+                value: 0.25,
+                color: AppColors.moodVitality,
+              ),
               const SizedBox(height: AppSpacing.stackMd),
               const GlowBar(label: '불안', value: 0.15, color: Colors.white),
               const SizedBox(height: AppSpacing.stackMd),
@@ -146,7 +161,9 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
                 '"오늘 당신의 마음은 맑은 하늘 아래 살랑이는 바람 같습니다. '
                 '작은 기대가 행복을 더 선명하게 만들고 있네요."',
                 style: AppTextStyles.bodyMedium.copyWith(
-                    fontStyle: FontStyle.italic, color: AppColors.onSurface),
+                  fontStyle: FontStyle.italic,
+                  color: AppColors.onSurface,
+                ),
               ),
             ],
           ),
@@ -172,9 +189,10 @@ class _AnalysisStone extends StatefulWidget {
 
 class _AnalysisStoneState extends State<_AnalysisStone>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 6))
-        ..repeat(reverse: true);
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 6),
+  )..repeat(reverse: true);
   @override
   void dispose() {
     _c.dispose();
@@ -218,15 +236,17 @@ class _AnalysisStoneState extends State<_AnalysisStone>
   }
 
   Widget _blob(Alignment a, Color c, double size) => Align(
-        alignment: a,
-        child: ImageFiltered(
-          imageFilter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle, color: c.withValues(alpha: 0.7)),
-          ),
+    alignment: a,
+    child: ImageFiltered(
+      imageFilter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: c.withValues(alpha: 0.7),
         ),
-      );
+      ),
+    ),
+  );
 }

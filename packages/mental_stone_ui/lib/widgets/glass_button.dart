@@ -114,19 +114,24 @@ class _GlassButtonState extends State<GlassButton> {
       );
     }
 
-    return GestureDetector(
-      onTapDown: disabled ? null : (_) => setState(() => _pressed = true),
-      onTapUp: disabled ? null : (_) => setState(() => _pressed = false),
-      onTapCancel: disabled ? null : () => setState(() => _pressed = false),
-      onTap: disabled ? null : widget.onPressed,
-      child: Opacity(
-        opacity: disabled && !widget.loading ? 0.5 : 1,
-        child: AnimatedScale(
-          scale: _pressed ? 0.95 : 1,
-          duration: const Duration(milliseconds: 150),
-          child: SizedBox(
-            width: widget.expand ? double.infinity : null,
-            child: body,
+    return Semantics(
+      button: true,
+      enabled: !disabled,
+      label: widget.label,
+      child: GestureDetector(
+        onTapDown: disabled ? null : (_) => setState(() => _pressed = true),
+        onTapUp: disabled ? null : (_) => setState(() => _pressed = false),
+        onTapCancel: disabled ? null : () => setState(() => _pressed = false),
+        onTap: disabled ? null : widget.onPressed,
+        child: Opacity(
+          opacity: disabled && !widget.loading ? 0.5 : 1,
+          child: AnimatedScale(
+            scale: _pressed ? 0.95 : 1,
+            duration: const Duration(milliseconds: 150),
+            child: SizedBox(
+              width: widget.expand ? double.infinity : null,
+              child: body,
+            ),
           ),
         ),
       ),
@@ -136,7 +141,12 @@ class _GlassButtonState extends State<GlassButton> {
 
 /// Round icon-only glass control (e.g. download / share secondary).
 class GlassIconButton extends StatelessWidget {
-  const GlassIconButton({super.key, required this.icon, this.onPressed, this.size = 56});
+  const GlassIconButton({
+    super.key,
+    required this.icon,
+    this.onPressed,
+    this.size = 56,
+  });
   final IconData icon;
   final VoidCallback? onPressed;
   final double size;

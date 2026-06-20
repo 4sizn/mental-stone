@@ -51,7 +51,11 @@ class HomeScreen extends ConsumerWidget {
           const MeshBackground(),
           ListView(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.marginPage, 96, AppSpacing.marginPage, 150),
+              AppSpacing.marginPage,
+              96,
+              AppSpacing.marginPage,
+              150,
+            ),
             children: [
               const _DateStrip(),
               const SizedBox(height: AppSpacing.stackLg),
@@ -60,11 +64,15 @@ class HomeScreen extends ConsumerWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("TODAY'S STATE",
-                          style: AppTextStyles.labelMedium.copyWith(
-                              letterSpacing: 1.6,
-                              color: AppColors.onSurfaceVariant
-                                  .withValues(alpha: 0.8))),
+                      Text(
+                        "TODAY'S STATE",
+                        style: AppTextStyles.labelMedium.copyWith(
+                          letterSpacing: 1.6,
+                          color: AppColors.onSurfaceVariant.withValues(
+                            alpha: 0.8,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 4),
                       Text('Balanced', style: AppTextStyles.displayLarge),
                     ],
@@ -122,10 +130,14 @@ class _EntryCard extends StatelessWidget {
               color: AppColors.tertiaryFixed.withValues(alpha: 0.35),
               borderRadius: AppRadii.rXl,
               border: Border.all(
-                  color: AppColors.tertiary.withValues(alpha: 0.2)),
+                color: AppColors.tertiary.withValues(alpha: 0.2),
+              ),
             ),
-            child: const Icon(Icons.auto_awesome,
-                color: AppColors.tertiary, size: 26),
+            child: const Icon(
+              Icons.auto_awesome,
+              color: AppColors.tertiary,
+              size: 26,
+            ),
           ),
           const SizedBox(width: AppSpacing.gutter),
           Expanded(
@@ -136,23 +148,30 @@ class _EntryCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Flexible(
-                      child: Text(title,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.bodyLarge.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.onSurface)),
+                      child: Text(
+                        title,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.onSurface,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 8),
-                    Text(_formatWhen(entry.createdAt),
-                        style: AppTextStyles.labelMedium),
+                    Text(
+                      _formatWhen(entry.createdAt),
+                      style: AppTextStyles.labelMedium,
+                    ),
                   ],
                 ),
                 if (body.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  Text(body,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.bodyMedium),
+                  Text(
+                    body,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bodyMedium,
+                  ),
                 ],
               ],
             ),
@@ -170,15 +189,22 @@ class _EmptyRecords extends StatelessWidget {
     return GlassCard(
       child: Column(
         children: [
-          const Icon(Icons.spa_outlined,
-              color: AppColors.onSurfaceVariant, size: 32),
+          const Icon(
+            Icons.spa_outlined,
+            color: AppColors.onSurfaceVariant,
+            size: 32,
+          ),
           const SizedBox(height: AppSpacing.stackSm),
-          Text('아직 기록이 없어요',
-              style: AppTextStyles.bodyLarge
-                  .copyWith(color: AppColors.onSurface)),
+          Text(
+            '아직 기록이 없어요',
+            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface),
+          ),
           const SizedBox(height: 4),
-          Text('+ 버튼을 눌러 첫 감정을 기록해 보세요.',
-              textAlign: TextAlign.center, style: AppTextStyles.bodyMedium),
+          Text(
+            '+ 버튼을 눌러 첫 감정을 기록해 보세요.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium,
+          ),
         ],
       ),
     );
@@ -220,22 +246,25 @@ class _DateStrip extends StatelessWidget {
                   ? AppColors.primary
                   : Colors.white.withValues(alpha: 0.2),
               borderRadius: AppRadii.rXxl,
-              border:
-                  active ? null : Border.all(color: AppGlass.edge, width: 1),
+              border: active
+                  ? null
+                  : Border.all(color: AppGlass.edge, width: 1),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(dow,
-                    style: AppTextStyles.labelMedium.copyWith(
-                        color: active
-                            ? Colors.white
-                            : AppColors.onSurfaceVariant)),
-                Text(num,
-                    style: AppTextStyles.headlineMedium.copyWith(
-                        color: active
-                            ? Colors.white
-                            : AppColors.onSurfaceVariant)),
+                Text(
+                  dow,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: active ? Colors.white : AppColors.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  num,
+                  style: AppTextStyles.headlineMedium.copyWith(
+                    color: active ? Colors.white : AppColors.onSurfaceVariant,
+                  ),
+                ),
               ],
             ),
           );

@@ -15,30 +15,39 @@ class EmotionSynthesisScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: MentalStoneAppBar(
-        back: true,
-        onLeading: () => context.pop(),
-      ),
+      appBar: MentalStoneAppBar(back: true, onLeading: () => context.pop()),
       body: Stack(
         children: [
           const MeshBackground(animate: true),
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.marginPage, 80, AppSpacing.marginPage, 120),
+                AppSpacing.marginPage,
+                80,
+                AppSpacing.marginPage,
+                120,
+              ),
               child: Column(
                 children: [
-                  Text('EMOTION SYNTHESIS COMPLETE',
-                      style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.primary, letterSpacing: 2.4)),
+                  Text(
+                    'EMOTION SYNTHESIS COMPLETE',
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.primary,
+                      letterSpacing: 2.4,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.stackSm),
-                  Text('새로운 감정 스톤 탄생',
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.headlineLarge),
+                  Text(
+                    '새로운 감정 스톤 탄생',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.headlineLarge,
+                  ),
                   const SizedBox(height: AppSpacing.stackSm),
-                  Text('행복의 따스함과 기대의 설렘이 응축된\n고유한 조각이 완성되었습니다.',
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.bodyMedium),
+                  Text(
+                    '행복의 따스함과 기대의 설렘이 응축된\n고유한 조각이 완성되었습니다.',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodyMedium,
+                  ),
                   const SizedBox(height: AppSpacing.stackLg),
                   const _SynthesisStone(),
                   const SizedBox(height: AppSpacing.stackLg),
@@ -50,7 +59,10 @@ class EmotionSynthesisScreen extends StatelessWidget {
                       const SizedBox(width: AppSpacing.stackMd),
                       Expanded(
                         child: _statTile(
-                            '기대', '36%', AppColors.moodAnticipation),
+                          '기대',
+                          '36%',
+                          AppColors.moodAnticipation,
+                        ),
                       ),
                     ],
                   ),
@@ -109,9 +121,12 @@ class EmotionSynthesisScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: AppTextStyles.labelMedium),
-              Text(value,
-                  style: AppTextStyles.headlineMedium
-                      .copyWith(color: AppColors.onSurface)),
+              Text(
+                value,
+                style: AppTextStyles.headlineMedium.copyWith(
+                  color: AppColors.onSurface,
+                ),
+              ),
             ],
           ),
         ],
@@ -157,9 +172,10 @@ class _SynthesisStone extends StatefulWidget {
 
 class _SynthesisStoneState extends State<_SynthesisStone>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 6))
-        ..repeat(reverse: true);
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 6),
+  )..repeat(reverse: true);
   @override
   void dispose() {
     _c.dispose();
@@ -199,7 +215,7 @@ class _SynthesisStoneState extends State<_SynthesisStone>
                         end: Alignment.bottomRight,
                         colors: [
                           AppColors.moodHappy,
-                          AppColors.moodAnticipation
+                          AppColors.moodAnticipation,
                         ],
                       ),
                     ),
@@ -215,7 +231,9 @@ class _SynthesisStoneState extends State<_SynthesisStone>
                       decoration: BoxDecoration(
                         borderRadius: radius,
                         border: Border.all(
-                            color: AppGlass.edgeStrong, width: 1.5),
+                          color: AppGlass.edgeStrong,
+                          width: 1.5,
+                        ),
                         gradient: const RadialGradient(
                           center: Alignment(-0.4, -0.4),
                           colors: [Color(0x66FFFFFF), Color(0x1AFFFFFF)],

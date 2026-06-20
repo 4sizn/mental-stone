@@ -27,9 +27,9 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
   Future<void> _save() async {
     final text = _controller.text.trim();
     if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('기록할 내용을 입력해주세요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('기록할 내용을 입력해주세요.')));
       return;
     }
     final user = ref.read(currentUserProvider);
@@ -44,9 +44,9 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
       if (mounted) context.push(Routes.analysis);
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장에 실패했어요. 다시 시도해 주세요.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('저장에 실패했어요. 다시 시도해 주세요.')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -58,23 +58,26 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: MentalStoneAppBar(
-        back: true,
-        onLeading: () => context.pop(),
-      ),
+      appBar: MentalStoneAppBar(back: true, onLeading: () => context.pop()),
       body: Stack(
         children: [
           const MeshBackground(),
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.marginPage, 112, AppSpacing.marginPage, 112),
+              AppSpacing.marginPage,
+              112,
+              AppSpacing.marginPage,
+              112,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('지금 이 순간', style: AppTextStyles.labelMedium),
                 const SizedBox(height: AppSpacing.stackSm),
-                Text('당신의 감정을\n돌에 담아보세요.',
-                    style: AppTextStyles.headlineLargeMobile),
+                Text(
+                  '당신의 감정을\n돌에 담아보세요.',
+                  style: AppTextStyles.headlineLargeMobile,
+                ),
                 const SizedBox(height: AppSpacing.stackLg),
                 Expanded(
                   child: GlassInput(
@@ -91,7 +94,11 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.marginPage, 0, AppSpacing.marginPage, 40),
+                AppSpacing.marginPage,
+                0,
+                AppSpacing.marginPage,
+                40,
+              ),
               child: GlassButton(
                 label: '기록 완료',
                 icon: Icons.done_all,

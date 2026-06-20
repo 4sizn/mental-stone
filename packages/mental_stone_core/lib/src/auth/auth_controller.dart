@@ -12,10 +12,7 @@ class AuthController extends AutoDisposeAsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<bool> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> signIn({required String email, required String password}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await ref
@@ -32,7 +29,9 @@ class AuthController extends AutoDisposeAsyncNotifier<void> {
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(authRepositoryProvider).signUpWithEmail(
+      await ref
+          .read(authRepositoryProvider)
+          .signUpWithEmail(
             email: email.trim(),
             password: password,
             displayName: displayName,

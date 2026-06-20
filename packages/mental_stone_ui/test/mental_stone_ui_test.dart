@@ -15,8 +15,9 @@ void main() {
       expect(theme.useMaterial3, isTrue);
     });
 
-    testWidgets('GlassButton renders its label and fires onPressed',
-        (tester) async {
+    testWidgets('GlassButton renders its label and fires onPressed', (
+      tester,
+    ) async {
       var tapped = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -37,8 +38,9 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('GlassButton shows a spinner and ignores taps while loading',
-        (tester) async {
+    testWidgets('GlassButton shows a spinner and ignores taps while loading', (
+      tester,
+    ) async {
       var tapped = false;
       await tester.pumpWidget(
         MaterialApp(

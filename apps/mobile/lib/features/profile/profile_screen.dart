@@ -13,6 +13,15 @@ class ProfileScreen extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
     final busy = ref.watch(authControllerProvider).isLoading;
 
+    // Surface a sign-out failure (sign-in/up errors are shown on their screens).
+    ref.listen(authControllerProvider, (prev, next) {
+      if (next.hasError && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그아웃에 실패했어요. 다시 시도해 주세요.')),
+        );
+      }
+    });
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -26,7 +35,11 @@ class ProfileScreen extends ConsumerWidget {
           const MeshBackground(),
           ListView(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.marginPage, 112, AppSpacing.marginPage, 40),
+              AppSpacing.marginPage,
+              112,
+              AppSpacing.marginPage,
+              40,
+            ),
             children: [
               profileAsync.when(
                 loading: () => const Padding(
@@ -34,11 +47,14 @@ class ProfileScreen extends ConsumerWidget {
                   child: Center(child: CircularProgressIndicator()),
                 ),
                 error: (_, _) => GlassCard(
-                  child: Text('프로필을 불러오지 못했어요.',
-                      style: AppTextStyles.bodyMedium),
+                  child: Text(
+                    '프로필을 불러오지 못했어요.',
+                    style: AppTextStyles.bodyMedium,
+                  ),
                 ),
                 data: (profile) {
-                  final name = profile?.name ??
+                  final name =
+                      profile?.name ??
                       user?.email?.split('@').first ??
                       'Friend';
                   final email = profile?.email ?? user?.email ?? '';
@@ -54,14 +70,16 @@ class ProfileScreen extends ConsumerWidget {
                         child: Column(
                           children: [
                             _InfoRow(
-                                icon: Icons.badge_outlined,
-                                label: '이름',
-                                value: name),
+                              icon: Icons.badge_outlined,
+                              label: '이름',
+                              value: name,
+                            ),
                             const Divider(color: Color(0x22000000), height: 24),
                             _InfoRow(
-                                icon: Icons.mail_outline,
-                                label: '이메일',
-                                value: email.isEmpty ? '—' : email),
+                              icon: Icons.mail_outline,
+                              label: '이메일',
+                              value: email.isEmpty ? '—' : email,
+                            ),
                           ],
                         ),
                       ),
@@ -79,8 +97,7 @@ class ProfileScreen extends ConsumerWidget {
                 loading: busy,
                 onPressed: busy
                     ? null
-                    : () =>
-                        ref.read(authControllerProvider.notifier).signOut(),
+                    : () => ref.read(authControllerProvider.notifier).signOut(),
               ),
             ],
           ),
@@ -106,21 +123,25 @@ class _Avatar extends StatelessWidget {
         image: url != null
             ? DecorationImage(image: NetworkImage(url!), fit: BoxFit.cover)
             : null,
-        boxShadow: const [
-          BoxShadow(color: Color(0x33BADBF5), blurRadius: 32),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x33BADBF5), blurRadius: 32)],
       ),
       child: url == null
-          ? const Icon(Icons.person,
-              size: 44, color: AppColors.onSecondaryContainer)
+          ? const Icon(
+              Icons.person,
+              size: 44,
+              color: AppColors.onSecondaryContainer,
+            )
           : null,
     );
   }
 }
 
 class _InfoRow extends StatelessWidget {
-  const _InfoRow(
-      {required this.icon, required this.label, required this.value});
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
   final IconData icon;
   final String label;
   final String value;
@@ -134,11 +155,14 @@ class _InfoRow extends StatelessWidget {
         Text(label, style: AppTextStyles.labelMedium),
         const Spacer(),
         Flexible(
-          child: Text(value,
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodyMedium
-                  .copyWith(color: AppColors.onSurface)),
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.onSurface,
+            ),
+          ),
         ),
       ],
     );

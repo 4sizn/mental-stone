@@ -34,11 +34,16 @@ class MentalStoneAppBar extends StatelessWidget implements PreferredSizeWidget {
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           padding: EdgeInsets.fromLTRB(
-              AppSpacing.marginPage, 14, AppSpacing.marginPage, 14),
+            AppSpacing.marginPage,
+            14,
+            AppSpacing.marginPage,
+            14,
+          ),
           decoration: BoxDecoration(
             color: AppColors.surface.withValues(alpha: 0.2),
             border: const Border(
-                bottom: BorderSide(color: AppGlass.edge, width: 1)),
+              bottom: BorderSide(color: AppGlass.edge, width: 1),
+            ),
           ),
           child: SafeArea(
             bottom: false,
@@ -52,14 +57,20 @@ class MentalStoneAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(title,
-                          style: AppTextStyles.headlineMedium.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary)),
+                      Text(
+                        title,
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
                       if (subtitle != null)
-                        Text(subtitle!,
-                            style: AppTextStyles.labelMedium
-                                .copyWith(letterSpacing: 0)),
+                        Text(
+                          subtitle!,
+                          style: AppTextStyles.labelMedium.copyWith(
+                            letterSpacing: 0,
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -79,14 +90,14 @@ class _LeadingButton extends StatelessWidget {
   final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) => InkResponse(
-        onTap: onTap,
-        radius: 24,
-        child: SizedBox(
-          width: 40,
-          height: 40,
-          child: Icon(icon, color: AppColors.onSurface),
-        ),
-      );
+    onTap: onTap,
+    radius: 26,
+    child: SizedBox(
+      width: 48,
+      height: 48,
+      child: Icon(icon, color: AppColors.onSurface),
+    ),
+  );
 }
 
 class _Avatar extends StatelessWidget {
@@ -95,21 +106,25 @@ class _Avatar extends StatelessWidget {
   final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.secondaryContainer,
-            border: Border.all(color: AppGlass.edge, width: 2),
-            image: url != null
-                ? DecorationImage(image: NetworkImage(url!), fit: BoxFit.cover)
-                : null,
-          ),
-          child: url == null
-              ? const Icon(Icons.person, size: 20, color: AppColors.onSecondaryContainer)
-              : null,
-        ),
-      );
+    onTap: onTap,
+    child: Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.secondaryContainer,
+        border: Border.all(color: AppGlass.edge, width: 2),
+        image: url != null
+            ? DecorationImage(image: NetworkImage(url!), fit: BoxFit.cover)
+            : null,
+      ),
+      child: url == null
+          ? const Icon(
+              Icons.person,
+              size: 20,
+              color: AppColors.onSecondaryContainer,
+            )
+          : null,
+    ),
+  );
 }

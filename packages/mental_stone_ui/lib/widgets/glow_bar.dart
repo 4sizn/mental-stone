@@ -29,15 +29,22 @@ class GlowBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label,
-                style: AppTextStyles.labelMedium
-                    .copyWith(color: AppColors.onSurface, letterSpacing: 0)),
+            Text(
+              label,
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.onSurface,
+                letterSpacing: 0,
+              ),
+            ),
             if (trailingPercent)
-              Text('${(value * 100).round()}%',
-                  style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0)),
+              Text(
+                '${(value * 100).round()}%',
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0,
+                ),
+              ),
           ],
         ),
         const SizedBox(height: 6),
@@ -59,8 +66,9 @@ class GlowBar extends StatelessWidget {
                       borderRadius: AppRadii.rPill,
                       boxShadow: [
                         BoxShadow(
-                            color: color.withValues(alpha: 0.7),
-                            blurRadius: 12),
+                          color: color.withValues(alpha: 0.7),
+                          blurRadius: 12,
+                        ),
                       ],
                     ),
                   );
@@ -69,10 +77,8 @@ class GlowBar extends StatelessWidget {
                     tween: Tween(begin: 0, end: w),
                     duration: const Duration(milliseconds: 1000),
                     curve: Curves.easeOut,
-                    builder: (_, animW, _) => SizedBox(
-                      width: animW,
-                      child: bar,
-                    ),
+                    builder: (_, animW, _) =>
+                        SizedBox(width: animW, child: bar),
                   );
                 },
               ),

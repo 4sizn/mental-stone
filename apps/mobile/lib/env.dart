@@ -7,8 +7,9 @@ abstract class Env {
   static const String supabaseKey = String.fromEnvironment('SUPABASE_KEY');
 
   /// v2 — native Kakao login.
-  static const String kakaoNativeAppKey =
-      String.fromEnvironment('KAKAO_NATIVE_APP_KEY');
+  static const String kakaoNativeAppKey = String.fromEnvironment(
+    'KAKAO_NATIVE_APP_KEY',
+  );
 
   static bool get isConfigured =>
       supabaseUrl.isNotEmpty && supabaseKey.isNotEmpty;

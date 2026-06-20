@@ -51,9 +51,9 @@ class _AnimatedMeshState extends State<_AnimatedMesh>
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _c,
-        builder: (_, _) => _MeshPoints(t: _c.value),
-      );
+    animation: _c,
+    builder: (_, _) => _MeshPoints(t: _c.value),
+  );
 }
 
 class _MeshPoints extends StatelessWidget {
@@ -74,17 +74,15 @@ class _MeshPoints extends StatelessWidget {
   }
 
   Widget _blob(Alignment a, Color c, double shift) => Align(
-        alignment: Alignment(a.x + shift, a.y),
-        child: FractionallySizedBox(
-          widthFactor: 0.8,
-          heightFactor: 0.8,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                colors: [c, c.withValues(alpha: 0)],
-              ),
-            ),
-          ),
+    alignment: Alignment(a.x + shift, a.y),
+    child: FractionallySizedBox(
+      widthFactor: 0.8,
+      heightFactor: 0.8,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(colors: [c, c.withValues(alpha: 0)]),
         ),
-      );
+      ),
+    ),
+  );
 }

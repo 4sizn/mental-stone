@@ -8,14 +8,12 @@ import 'package:mental_stone/features/auth/sign_in_screen.dart';
 void main() {
   // Renders without Supabase: SignInScreen only touches the repository when
   // the user submits, which this test does not do.
-  testWidgets('SignInScreen renders email/password fields and CTA',
-      (tester) async {
+  testWidgets('SignInScreen renders email/password fields and CTA', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
-        child: MaterialApp(
-          theme: AppTheme.light(),
-          home: const SignInScreen(),
-        ),
+        child: MaterialApp(theme: AppTheme.light(), home: const SignInScreen()),
       ),
     );
     await tester.pump();
@@ -26,14 +24,12 @@ void main() {
     expect(find.textContaining('가입하기'), findsOneWidget);
   });
 
-  testWidgets('SignInScreen shows a validation error for a bad email',
-      (tester) async {
+  testWidgets('SignInScreen shows a validation error for a bad email', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
-        child: MaterialApp(
-          theme: AppTheme.light(),
-          home: const SignInScreen(),
-        ),
+        child: MaterialApp(theme: AppTheme.light(), home: const SignInScreen()),
       ),
     );
     await tester.pump();

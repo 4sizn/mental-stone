@@ -25,15 +25,17 @@ class _RecordsScreenState extends State<RecordsScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: MentalStoneAppBar(
-        onLeading: () => context.push(Routes.profile),
-      ),
+      appBar: MentalStoneAppBar(onLeading: () => context.push(Routes.profile)),
       body: Stack(
         children: [
           const MeshBackground(),
           ListView(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.marginPage, 96, AppSpacing.marginPage, 120),
+              AppSpacing.marginPage,
+              96,
+              AppSpacing.marginPage,
+              120,
+            ),
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,15 +45,19 @@ class _RecordsScreenState extends State<RecordsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('My Collection', style: AppTextStyles.labelMedium),
-                      Text('6월 누적 기록',
-                          style: AppTextStyles.headlineLargeMobile),
+                      Text(
+                        '6월 누적 기록',
+                        style: AppTextStyles.headlineLargeMobile,
+                      ),
                     ],
                   ),
-                  Row(children: [
-                    _round(Icons.chevron_left),
-                    const SizedBox(width: AppSpacing.stackSm),
-                    _round(Icons.chevron_right),
-                  ]),
+                  Row(
+                    children: [
+                      _round(Icons.chevron_left),
+                      const SizedBox(width: AppSpacing.stackSm),
+                      _round(Icons.chevron_right),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.stackMd),
@@ -75,8 +81,14 @@ class _RecordsScreenState extends State<RecordsScreen> {
                         _StoneCell(day: '03'), // empty
                         _StoneCell(day: '04', color: AppColors.primary),
                         _StoneCell(day: '05'),
-                        _StoneCell(day: '06', color: AppColors.tertiaryFixedDim),
-                        _StoneCell(day: '07', color: AppColors.secondaryFixedDim),
+                        _StoneCell(
+                          day: '06',
+                          color: AppColors.tertiaryFixedDim,
+                        ),
+                        _StoneCell(
+                          day: '07',
+                          color: AppColors.secondaryFixedDim,
+                        ),
                         _StoneCell(day: '08', color: AppColors.outline),
                       ],
                     ),
@@ -86,16 +98,29 @@ class _RecordsScreenState extends State<RecordsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('이번 달 총 22개의 감정 수집',
-                            style: AppTextStyles.labelMedium),
+                        Text(
+                          '이번 달 총 22개의 감정 수집',
+                          style: AppTextStyles.labelMedium,
+                        ),
                         SizedBox(
                           width: 56,
                           height: 24,
-                          child: Stack(children: const [
-                            Positioned(left: 0, child: _Dot(AppColors.tertiary)),
-                            Positioned(left: 16, child: _Dot(AppColors.secondary)),
-                            Positioned(left: 32, child: _Dot(AppColors.primary)),
-                          ]),
+                          child: Stack(
+                            children: const [
+                              Positioned(
+                                left: 0,
+                                child: _Dot(AppColors.tertiary),
+                              ),
+                              Positioned(
+                                left: 16,
+                                child: _Dot(AppColors.secondary),
+                              ),
+                              Positioned(
+                                left: 32,
+                                child: _Dot(AppColors.primary),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -105,20 +130,32 @@ class _RecordsScreenState extends State<RecordsScreen> {
               const SizedBox(height: AppSpacing.stackLg),
               Text('최근 일기 요약', style: AppTextStyles.labelMedium),
               const SizedBox(height: AppSpacing.stackMd),
-              _summary('6월 7일 금요일', '오후 11:30',
-                  '오늘은 유난히 차분한 하루였다. 복잡했던 생각들이 저녁 노을과 함께 가라앉는 기분이었다.',
-                  AppColors.tertiary, AppColors.tertiaryFixed,
-                  const ['#차분함', '#사색']),
+              _summary(
+                '6월 7일 금요일',
+                '오후 11:30',
+                '오늘은 유난히 차분한 하루였다. 복잡했던 생각들이 저녁 노을과 함께 가라앉는 기분이었다.',
+                AppColors.tertiary,
+                AppColors.tertiaryFixed,
+                const ['#차분함', '#사색'],
+              ),
               const SizedBox(height: AppSpacing.stackMd),
-              _summary('6월 6일 목요일', '오후 10:15',
-                  '프로젝트 결과가 좋아서 정말 기뻤던 날. 친구들과 맛있는 저녁을 먹으며 에너지를 얻었다.',
-                  AppColors.secondary, AppColors.secondaryFixed,
-                  const ['#활기찬', '#성취감']),
+              _summary(
+                '6월 6일 목요일',
+                '오후 10:15',
+                '프로젝트 결과가 좋아서 정말 기뻤던 날. 친구들과 맛있는 저녁을 먹으며 에너지를 얻었다.',
+                AppColors.secondary,
+                AppColors.secondaryFixed,
+                const ['#활기찬', '#성취감'],
+              ),
               const SizedBox(height: AppSpacing.stackMd),
-              _summary('6월 4일 화요일', '오전 08:20',
-                  '조금은 몽롱한 아침. 어제 읽다 만 소설의 여운이 가시지 않아 침대에서 조금 더 뒹굴거렸다.',
-                  AppColors.primary, AppColors.surfaceVariant,
-                  const ['#몽상', '#평온']),
+              _summary(
+                '6월 4일 화요일',
+                '오전 08:20',
+                '조금은 몽롱한 아침. 어제 읽다 만 소설의 여운이 가시지 않아 침대에서 조금 더 뒹굴거렸다.',
+                AppColors.primary,
+                AppColors.surfaceVariant,
+                const ['#몽상', '#평온'],
+              ),
             ],
           ),
           if (widget.showBottomNav)
@@ -132,10 +169,10 @@ class _RecordsScreenState extends State<RecordsScreen> {
   }
 
   Widget _round(IconData icon) => GlassCard(
-        padding: const EdgeInsets.all(8),
-        borderRadius: AppRadii.rPill,
-        child: Icon(icon, color: AppColors.onSurface, size: 20),
-      );
+    padding: const EdgeInsets.all(8),
+    borderRadius: AppRadii.rPill,
+    child: Icon(icon, color: AppColors.onSurface, size: 20),
+  );
 
   Widget _segmented() {
     const labels = ['주', '월', '연'];
@@ -157,14 +194,16 @@ class _RecordsScreenState extends State<RecordsScreen> {
                         : Colors.transparent,
                     borderRadius: AppRadii.rPill,
                   ),
-                  child: Text(labels[i],
-                      style: AppTextStyles.labelMedium.copyWith(
-                          letterSpacing: 0,
-                          fontWeight:
-                              _tab == i ? FontWeight.w700 : FontWeight.w500,
-                          color: _tab == i
-                              ? AppColors.primary
-                              : AppColors.onSurfaceVariant)),
+                  child: Text(
+                    labels[i],
+                    style: AppTextStyles.labelMedium.copyWith(
+                      letterSpacing: 0,
+                      fontWeight: _tab == i ? FontWeight.w700 : FontWeight.w500,
+                      color: _tab == i
+                          ? AppColors.primary
+                          : AppColors.onSurfaceVariant,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -173,8 +212,14 @@ class _RecordsScreenState extends State<RecordsScreen> {
     );
   }
 
-  Widget _summary(String date, String time, String body, Color accent,
-      Color tint, List<String> tags) {
+  Widget _summary(
+    String date,
+    String time,
+    String body,
+    Color accent,
+    Color tint,
+    List<String> tags,
+  ) {
     return GlassCard(
       borderRadius: AppRadii.rXl,
       onTap: () => context.push(Routes.diary),
@@ -198,8 +243,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: accent.withValues(alpha: 0.9)),
+                shape: BoxShape.circle,
+                color: accent.withValues(alpha: 0.9),
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.gutter),
@@ -210,21 +256,30 @@ class _RecordsScreenState extends State<RecordsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(date,
-                        style: AppTextStyles.labelMedium.copyWith(
-                            letterSpacing: 0,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.onSurface)),
-                    Text(time,
-                        style: AppTextStyles.labelMedium.copyWith(
-                            fontSize: 12, letterSpacing: 0)),
+                    Text(
+                      date,
+                      style: AppTextStyles.labelMedium.copyWith(
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    Text(
+                      time,
+                      style: AppTextStyles.labelMedium.copyWith(
+                        fontSize: 12,
+                        letterSpacing: 0,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(body,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.bodyMedium),
+                Text(
+                  body,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyMedium,
+                ),
                 const SizedBox(height: AppSpacing.stackSm),
                 Row(
                   children: [
@@ -248,11 +303,11 @@ class _Label extends StatelessWidget {
   final String text;
   @override
   Widget build(BuildContext context) => Center(
-        child: Opacity(
-          opacity: 0.5,
-          child: Text(text, style: AppTextStyles.labelMedium),
-        ),
-      );
+    child: Opacity(
+      opacity: 0.5,
+      child: Text(text, style: AppTextStyles.labelMedium),
+    ),
+  );
 }
 
 class _Dot extends StatelessWidget {
@@ -260,14 +315,14 @@ class _Dot extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) => Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: color,
-          border: Border.all(color: Colors.white, width: 1.5),
-        ),
-      );
+    width: 24,
+    height: 24,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: color,
+      border: Border.all(color: Colors.white, width: 1.5),
+    ),
+  );
 }
 
 /// A single collected (or empty) day stone in the grid.
@@ -304,9 +359,11 @@ class _StoneCell extends StatelessWidget {
                 ),
               ),
               child: empty
-                  ? Icon(Icons.question_mark,
+                  ? Icon(
+                      Icons.question_mark,
                       size: 18,
-                      color: AppColors.onSurfaceVariant.withValues(alpha: 0.5))
+                      color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                    )
                   : FractionallySizedBox(
                       widthFactor: 0.6,
                       heightFactor: 0.6,
@@ -321,9 +378,13 @@ class _StoneCell extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(day,
-            style: AppTextStyles.labelMedium
-                .copyWith(fontSize: 10, letterSpacing: 0)),
+        Text(
+          day,
+          style: AppTextStyles.labelMedium.copyWith(
+            fontSize: 10,
+            letterSpacing: 0,
+          ),
+        ),
       ],
     );
   }

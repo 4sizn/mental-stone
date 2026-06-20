@@ -45,23 +45,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-          path: Routes.signIn, builder: (_, _) => const SignInScreen()),
-      GoRoute(
-          path: Routes.signUp, builder: (_, _) => const SignUpScreen()),
+      GoRoute(path: Routes.signIn, builder: (_, _) => const SignInScreen()),
+      GoRoute(path: Routes.signUp, builder: (_, _) => const SignUpScreen()),
       GoRoute(path: Routes.home, builder: (_, _) => const MainShell()),
+      GoRoute(path: Routes.record, builder: (_, _) => const RecordScreen()),
       GoRoute(
-          path: Routes.record, builder: (_, _) => const RecordScreen()),
+        path: Routes.analysis,
+        builder: (_, _) => const EmotionAnalysisScreen(),
+      ),
       GoRoute(
-          path: Routes.analysis,
-          builder: (_, _) => const EmotionAnalysisScreen()),
-      GoRoute(
-          path: Routes.synthesis,
-          builder: (_, _) => const EmotionSynthesisScreen()),
-      GoRoute(
-          path: Routes.diary, builder: (_, _) => const DiaryEntryScreen()),
-      GoRoute(
-          path: Routes.profile, builder: (_, _) => const ProfileScreen()),
+        path: Routes.synthesis,
+        builder: (_, _) => const EmotionSynthesisScreen(),
+      ),
+      GoRoute(path: Routes.diary, builder: (_, _) => const DiaryEntryScreen()),
+      GoRoute(path: Routes.profile, builder: (_, _) => const ProfileScreen()),
     ],
   );
 });

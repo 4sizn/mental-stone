@@ -64,15 +64,11 @@ class _CalendarPlaceholder extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: MentalStoneAppBar(
-        onLeading: () => context.push(Routes.profile),
-      ),
+      appBar: MentalStoneAppBar(onLeading: () => context.push(Routes.profile)),
       body: Stack(
         children: [
           const MeshBackground(),
-          Center(
-            child: Text('Calendar', style: AppTextStyles.headlineMedium),
-          ),
+          Center(child: Text('Calendar', style: AppTextStyles.headlineMedium)),
         ],
       ),
     );

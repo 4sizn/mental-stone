@@ -40,19 +40,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
     setState(() => _localError = null);
     // On success the auth stream fires and the router redirects to home.
-    await ref.read(authControllerProvider.notifier).signUp(
-          email: email,
-          password: password,
-          displayName: _name.text,
-        );
+    await ref
+        .read(authControllerProvider.notifier)
+        .signUp(email: email, password: password, displayName: _name.text);
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authControllerProvider);
     final loading = state.isLoading;
-    final error = _localError ??
-        (state.hasError ? authErrorMessage(state.error!) : null);
+    final error =
+        _localError ?? (state.hasError ? authErrorMessage(state.error!) : null);
 
     return AuthScaffold(
       child: Column(
@@ -65,12 +63,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.stackLg),
-          Text('감정의 여정을 시작하세요',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.headlineLargeMobile),
+          Text(
+            '감정의 여정을 시작하세요',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.headlineLargeMobile,
+          ),
           const SizedBox(height: AppSpacing.stackSm),
-          Text('당신만의 감정 스톤을 모아보세요.',
-              textAlign: TextAlign.center, style: AppTextStyles.bodyMedium),
+          Text(
+            '당신만의 감정 스톤을 모아보세요.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium,
+          ),
           const SizedBox(height: AppSpacing.stackLg),
           GlassCard(
             child: Column(
@@ -105,13 +108,19 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   const SizedBox(height: AppSpacing.stackMd),
                   Row(
                     children: [
-                      const Icon(Icons.error_outline,
-                          color: AppColors.error, size: 18),
+                      const Icon(
+                        Icons.error_outline,
+                        color: AppColors.error,
+                        size: 18,
+                      ),
                       const SizedBox(width: 6),
                       Expanded(
-                        child: Text(error,
-                            style: AppTextStyles.labelMedium
-                                .copyWith(color: AppColors.error)),
+                        child: Text(
+                          error,
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: AppColors.error,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -138,8 +147,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   TextSpan(
                     text: '로그인',
                     style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w700),
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),

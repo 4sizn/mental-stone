@@ -23,7 +23,11 @@ class DiaryEntryScreen extends StatelessWidget {
           const MeshBackground(),
           ListView(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.marginPage, 104, AppSpacing.marginPage, 40),
+              AppSpacing.marginPage,
+              104,
+              AppSpacing.marginPage,
+              40,
+            ),
             children: [
               const Center(child: _HeroStone()),
               const SizedBox(height: AppSpacing.stackMd),
@@ -31,14 +35,19 @@ class DiaryEntryScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const EmotionChip(
-                        label: 'Calm & Reflective',
-                        color: AppColors.secondary),
+                      label: 'Calm & Reflective',
+                      color: AppColors.secondary,
+                    ),
                     const SizedBox(height: AppSpacing.stackSm),
-                    Text('The Silence of Morning',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.headlineLargeMobile),
-                    Text('Monday, October 14 • 7:30 AM',
-                        style: AppTextStyles.bodyMedium),
+                    Text(
+                      'The Silence of Morning',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.headlineLargeMobile,
+                    ),
+                    Text(
+                      'Monday, October 14 • 7:30 AM',
+                      style: AppTextStyles.bodyMedium,
+                    ),
                   ],
                 ),
               ),
@@ -51,16 +60,17 @@ class DiaryEntryScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 16),
                       decoration: const BoxDecoration(
                         border: Border(
-                            left: BorderSide(
-                                color: Color(0x335D5F5F), width: 4)),
+                          left: BorderSide(color: Color(0x335D5F5F), width: 4),
+                        ),
                       ),
                       child: Text(
                         '"I woke up before the alarm today. The light was '
                         'filtering through the curtains in a way that felt '
                         'like a quiet conversation..."',
                         style: AppTextStyles.bodyLarge.copyWith(
-                            fontStyle: FontStyle.italic,
-                            color: AppColors.onSurface),
+                          fontStyle: FontStyle.italic,
+                          color: AppColors.onSurface,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.stackMd),
@@ -72,7 +82,8 @@ class DiaryEntryScreen extends StatelessWidget {
                       'dissipated during sleep, leaving behind a smooth, cool '
                       'surface of calm.',
                       style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.onSurface.withValues(alpha: 0.8)),
+                        color: AppColors.onSurface.withValues(alpha: 0.8),
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.stackMd),
                     Wrap(
@@ -95,36 +106,48 @@ class DiaryEntryScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(children: [
-                          const Icon(Icons.analytics, color: AppColors.primary),
-                          const SizedBox(width: 8),
-                          Text('Emotional Spectrum',
-                              style: AppTextStyles.headlineMedium),
-                        ]),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.analytics,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Emotional Spectrum',
+                              style: AppTextStyles.headlineMedium,
+                            ),
+                          ],
+                        ),
                         Text('AI Analysis', style: AppTextStyles.labelMedium),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.stackMd),
                     const GlowBar(
-                        label: 'Serenity',
-                        value: 0.85,
-                        color: AppColors.moodSerenity),
+                      label: 'Serenity',
+                      value: 0.85,
+                      color: AppColors.moodSerenity,
+                    ),
                     const SizedBox(height: AppSpacing.stackMd),
                     const GlowBar(
-                        label: 'Clarity',
-                        value: 0.72,
-                        color: AppColors.moodClarity),
+                      label: 'Clarity',
+                      value: 0.72,
+                      color: AppColors.moodClarity,
+                    ),
                     const SizedBox(height: AppSpacing.stackMd),
                     const GlowBar(
-                        label: 'Vitality',
-                        value: 0.45,
-                        color: AppColors.moodVitality),
+                      label: 'Vitality',
+                      value: 0.45,
+                      color: AppColors.moodVitality,
+                    ),
                     const SizedBox(height: AppSpacing.stackMd),
                     Text(
                       '"Your entry suggests a high state of mindful presence '
                       'and a significant reduction in cortisol markers."',
                       style: AppTextStyles.labelMedium.copyWith(
-                          fontStyle: FontStyle.italic, letterSpacing: 0),
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: 0,
+                      ),
                     ),
                   ],
                 ),
@@ -166,9 +189,10 @@ class _HeroStone extends StatefulWidget {
 
 class _HeroStoneState extends State<_HeroStone>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 6))
-        ..repeat(reverse: true);
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 6),
+  )..repeat(reverse: true);
   @override
   void dispose() {
     _c.dispose();
@@ -180,8 +204,9 @@ class _HeroStoneState extends State<_HeroStone>
     return AnimatedBuilder(
       animation: _c,
       builder: (_, child) => Transform.translate(
-          offset: Offset(0, -10 * Curves.easeInOut.transform(_c.value)),
-          child: child),
+        offset: Offset(0, -10 * Curves.easeInOut.transform(_c.value)),
+        child: child,
+      ),
       child: ClipOval(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
