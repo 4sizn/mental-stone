@@ -1,0 +1,17 @@
+name: mental_stone
+
+scripts:
+  analyze:
+    description: Statically analyze every package.
+    exec: flutter analyze
+  test:
+    description: Run tests in every package that has a test/ dir.
+    exec: flutter test
+    packageFilters:
+      dirExists: test
+  format:
+    description: Format all Dart sources.
+    run: dart format apps packages
+  format-check:
+    description: Verify formatting without writing.
+    run: dart format --output none --set-exit-if-changed apps packages

@@ -1,0 +1,16 @@
+name: mental_stone_workspace
+description: "Mental Stone — Flutter monorepo (app + design system + core)."
+publish_to: "none"
+
+environment:
+  sdk: ^3.11.5
+
+# Dart pub workspaces (SDK 3.6+): one lockfile + shared .dart_tool for all
+# member packages. Melos orchestrates cross-package scripts on top.
+workspace:
+  - apps/mobile
+  - packages/mental_stone_ui
+  - packages/mental_stone_core
+
+dev_dependencies:
+  melos: ^7.0.0

@@ -1,0 +1,20 @@
+name: mental_stone_core
+description: "Mental Stone — core data & domain layer (Supabase, auth, repositories)."
+version: 0.1.0
+publish_to: "none"
+resolution: workspace
+
+environment:
+  sdk: ^3.11.5
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.5.0
+  flutter_riverpod: ^2.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
