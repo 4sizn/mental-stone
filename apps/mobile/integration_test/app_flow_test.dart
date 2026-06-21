@@ -58,7 +58,7 @@ void main() {
     await binding.takeScreenshot('04-home');
 
     // Open the profile (app-bar menu) → shows the auto-created profile.
-    await tester.tap(find.byIcon(Icons.menu));
+    await tester.tap(find.byIcon(Icons.person));
     await pumpFor(tester, const Duration(seconds: 2));
     await binding.takeScreenshot('05-profile');
     await tester.tap(find.byIcon(Icons.arrow_back));

@@ -21,9 +21,9 @@ class EmotionSynthesisScreen extends StatelessWidget {
           const EtherealBackground(variant: AuraVariant.synthesis),
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(
+              padding: EdgeInsets.fromLTRB(
                 AppSpacing.marginPage,
-                80,
+                MediaQuery.paddingOf(context).top + 52,
                 AppSpacing.marginPage,
                 120,
               ),

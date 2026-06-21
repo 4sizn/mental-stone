@@ -63,9 +63,9 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
         children: [
           const EtherealBackground(variant: AuraVariant.record),
           Padding(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSpacing.marginPage,
-              112,
+              MediaQuery.paddingOf(context).top + 52,
               AppSpacing.marginPage,
               112,
             ),

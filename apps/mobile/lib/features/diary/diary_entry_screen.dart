@@ -22,9 +22,9 @@ class DiaryEntryScreen extends StatelessWidget {
         children: [
           const EtherealBackground(variant: AuraVariant.home),
           ListView(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSpacing.marginPage,
-              104,
+              MediaQuery.paddingOf(context).top + 52,
               AppSpacing.marginPage,
               40,
             ),

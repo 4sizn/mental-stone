@@ -50,9 +50,9 @@ class HomeScreen extends ConsumerWidget {
         children: [
           const EtherealBackground(variant: AuraVariant.home),
           ListView(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSpacing.marginPage,
-              96,
+              MediaQuery.paddingOf(context).top + 52,
               AppSpacing.marginPage,
               150,
             ),

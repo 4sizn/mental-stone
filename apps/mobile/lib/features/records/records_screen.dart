@@ -30,9 +30,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
         children: [
           const EtherealBackground(variant: AuraVariant.records),
           ListView(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSpacing.marginPage,
-              96,
+              MediaQuery.paddingOf(context).top + 52,
               AppSpacing.marginPage,
               120,
             ),
