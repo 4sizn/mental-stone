@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
 
 import '../../router/app_router.dart';
+import '../calendar/calendar_screen.dart';
 import '../home/home_screen.dart';
 import '../records/records_screen.dart';
 
@@ -32,7 +33,7 @@ class _MainShellState extends State<MainShell> {
             index: index,
             children: const [
               HomeScreen(showBottomNav: false),
-              _CalendarPlaceholder(),
+              CalendarScreen(),
               RecordsScreen(showBottomNav: false),
             ],
           ),
@@ -60,20 +61,3 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-class _CalendarPlaceholder extends StatelessWidget {
-  const _CalendarPlaceholder();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
-      appBar: MentalStoneAppBar(onLeading: () => context.push(Routes.profile)),
-      body: Stack(
-        children: [
-          const EtherealBackground(variant: AuraVariant.home),
-          Center(child: Text('Calendar', style: AppTextStyles.headlineMedium)),
-        ],
-      ),
-    );
-  }
-}

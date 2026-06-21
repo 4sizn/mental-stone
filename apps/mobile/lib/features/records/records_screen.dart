@@ -1,27 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mental_stone_core/mental_stone_core.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
 
 import '../../router/app_router.dart';
+import '../../widgets/journal_summary_card.dart';
 
 /// Screen 06 — My Stone Records (the "jewelry box" collection).
 ///
 /// v1 keeps the designed visualization as a showcase; wiring the calendar to
 /// real aggregates is a follow-up.
-class RecordsScreen extends StatefulWidget {
+class RecordsScreen extends ConsumerStatefulWidget {
   const RecordsScreen({super.key, this.showBottomNav = true});
 
   /// Set false when hosted inside [MainShell] (which owns the nav).
   final bool showBottomNav;
   @override
-  State<RecordsScreen> createState() => _RecordsScreenState();
+  ConsumerState<RecordsScreen> createState() => _RecordsScreenState();
 }
 
-class _RecordsScreenState extends State<RecordsScreen> {
+class _RecordsScreenState extends ConsumerState<RecordsScreen> {
   int _tab = 1; // 주 / 월 / 연
 
   @override
   Widget build(BuildContext context) {
+    final entries =
+        ref.watch(journalEntriesProvider).valueOrNull ?? const <JournalEntry>[];
+    final summaries = <Widget>[];
+    if (entries.isNotEmpty) {
+      for (var i = 0; i < entries.length && i < 8; i++) {
+        if (i > 0) summaries.add(const SizedBox(height: AppSpacing.stackMd));
+        summaries.add(JournalSummaryCard(
+          entry: entries[i],
+          accent: kEntryAccents[i % kEntryAccents.length],
+          tint: kEntryTints[i % kEntryTints.length],
+        ));
+      }
+    } else {
+      // No real records yet — keep the sample summaries as filler.
+      summaries.addAll([
+        _summary(
+          '6월 7일 금요일',
+          '오후 11:30',
+          '오늘은 유난히 차분한 하루였다. 복잡했던 생각들이 저녁 노을과 함께 가라앉는 기분이었다.',
+          AppColors.tertiary,
+          AppColors.tertiaryFixed,
+          const ['#차분함', '#사색'],
+        ),
+        const SizedBox(height: AppSpacing.stackMd),
+        _summary(
+          '6월 6일 목요일',
+          '오후 10:15',
+          '프로젝트 결과가 좋아서 정말 기뻤던 날. 친구들과 맛있는 저녁을 먹으며 에너지를 얻었다.',
+          AppColors.secondary,
+          AppColors.secondaryFixed,
+          const ['#활기찬', '#성취감'],
+        ),
+        const SizedBox(height: AppSpacing.stackMd),
+        _summary(
+          '6월 4일 화요일',
+          '오전 08:20',
+          '조금은 몽롱한 아침. 어제 읽다 만 소설의 여운이 가시지 않아 침대에서 조금 더 뒹굴거렸다.',
+          AppColors.primary,
+          AppColors.surfaceVariant,
+          const ['#몽상', '#평온'],
+        ),
+      ]);
+    }
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -130,32 +176,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
               const SizedBox(height: AppSpacing.stackLg),
               Text('최근 일기 요약', style: AppTextStyles.labelMedium),
               const SizedBox(height: AppSpacing.stackMd),
-              _summary(
-                '6월 7일 금요일',
-                '오후 11:30',
-                '오늘은 유난히 차분한 하루였다. 복잡했던 생각들이 저녁 노을과 함께 가라앉는 기분이었다.',
-                AppColors.tertiary,
-                AppColors.tertiaryFixed,
-                const ['#차분함', '#사색'],
-              ),
-              const SizedBox(height: AppSpacing.stackMd),
-              _summary(
-                '6월 6일 목요일',
-                '오후 10:15',
-                '프로젝트 결과가 좋아서 정말 기뻤던 날. 친구들과 맛있는 저녁을 먹으며 에너지를 얻었다.',
-                AppColors.secondary,
-                AppColors.secondaryFixed,
-                const ['#활기찬', '#성취감'],
-              ),
-              const SizedBox(height: AppSpacing.stackMd),
-              _summary(
-                '6월 4일 화요일',
-                '오전 08:20',
-                '조금은 몽롱한 아침. 어제 읽다 만 소설의 여운이 가시지 않아 침대에서 조금 더 뒹굴거렸다.',
-                AppColors.primary,
-                AppColors.surfaceVariant,
-                const ['#몽상', '#평온'],
-              ),
+              ...summaries,
             ],
           ),
           if (widget.showBottomNav)
