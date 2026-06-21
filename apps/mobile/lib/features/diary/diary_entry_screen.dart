@@ -2,14 +2,22 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mental_stone_core/mental_stone_core.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
 
-/// Screen 02 — Diary Entry (read view). v1 shows a designed sample entry.
+import '../../widgets/journal_summary_card.dart';
+
+/// Screen 02 — Diary Entry (read view). Renders a real [entry] when one is
+/// passed (via go_router `extra`); falls back to a designed sample otherwise.
 class DiaryEntryScreen extends StatelessWidget {
-  const DiaryEntryScreen({super.key});
+  const DiaryEntryScreen({super.key, this.entry});
+
+  final JournalEntry? entry;
 
   @override
   Widget build(BuildContext context) {
+    final e = entry;
+    if (e != null) return _RealDiaryView(entry: e);
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -167,6 +175,107 @@ class DiaryEntryScreen extends StatelessWidget {
                   Expanded(
                     child: GlassButton(
                       label: 'Store in Vault',
+                      expand: true,
+                      onPressed: () => context.pop(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Real diary view backed by a user [JournalEntry].
+class _RealDiaryView extends StatelessWidget {
+  const _RealDiaryView({required this.entry});
+  final JournalEntry entry;
+
+  String _title(String body) {
+    if (body.isEmpty) return '오늘의 감정 기록';
+    final firstLine = body.split('\n').first.trim();
+    return firstLine.length <= 22 ? firstLine : '${firstLine.substring(0, 22)}…';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final body = entry.body?.trim() ?? '';
+    final mood = entry.mood?.trim();
+    final topPad = MediaQuery.paddingOf(context).top + 52;
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: MentalStoneAppBar(
+        back: true,
+        subtitle: 'Diary Entry',
+        onLeading: () => context.pop(),
+      ),
+      body: Stack(
+        children: [
+          const EtherealBackground(variant: AuraVariant.home),
+          ListView(
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.marginPage, topPad, AppSpacing.marginPage, 40),
+            children: [
+              const Center(child: _HeroStone()),
+              const SizedBox(height: AppSpacing.stackMd),
+              Center(
+                child: Column(
+                  children: [
+                    if (mood != null && mood.isNotEmpty) ...[
+                      EmotionChip(label: mood, color: AppColors.secondary),
+                      const SizedBox(height: AppSpacing.stackSm),
+                    ],
+                    Text(_title(body),
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.headlineLargeMobile),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${formatEntryDate(entry.createdAt)} · ${formatEntryTime(entry.createdAt)}',
+                      style: AppTextStyles.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.stackLg),
+              GlassCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      body.isEmpty ? '작성된 내용이 없어요.' : body,
+                      style: AppTextStyles.bodyLarge.copyWith(
+                          color: AppColors.onSurface, height: 1.6),
+                    ),
+                    if (mood != null && mood.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.stackMd),
+                      Wrap(
+                        spacing: AppSpacing.stackSm,
+                        runSpacing: AppSpacing.stackSm,
+                        children: [EmotionChip(label: '#$mood', tonal: false)],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.stackLg),
+              Row(
+                children: [
+                  Expanded(
+                    child: GlassButton(
+                      label: '공유하기',
+                      variant: GlassButtonVariant.glass,
+                      expand: true,
+                      onPressed: () {},
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.stackMd),
+                  Expanded(
+                    child: GlassButton(
+                      label: '보관하기',
                       expand: true,
                       onPressed: () => context.pop(),
                     ),

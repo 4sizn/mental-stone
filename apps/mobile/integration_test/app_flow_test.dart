@@ -104,5 +104,13 @@ void main() {
       await pumpFor(tester, const Duration(seconds: 2));
       await binding.takeScreenshot('09-calendar');
     }
+
+    // Tap the real entry → its diary page should show the user's own text.
+    final entryCard = find.textContaining('오늘은 마음이');
+    if (entryCard.evaluate().isNotEmpty) {
+      await tester.tap(entryCard.first);
+      await pumpFor(tester, const Duration(seconds: 2));
+      await binding.takeScreenshot('10-diary');
+    }
   });
 }

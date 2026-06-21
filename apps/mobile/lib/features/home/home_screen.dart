@@ -132,7 +132,7 @@ class _EntryCard extends StatelessWidget {
     final body = entry.body?.trim() ?? '';
     return GlassCard(
       borderRadius: AppRadii.rXl,
-      onTap: () => context.push(Routes.diary),
+      onTap: () => context.push(Routes.diary, extra: entry),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

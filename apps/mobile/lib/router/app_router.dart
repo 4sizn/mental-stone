@@ -57,7 +57,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.synthesis,
         builder: (_, _) => const EmotionSynthesisScreen(),
       ),
-      GoRoute(path: Routes.diary, builder: (_, _) => const DiaryEntryScreen()),
+      GoRoute(
+        path: Routes.diary,
+        builder: (context, state) =>
+            DiaryEntryScreen(entry: state.extra as JournalEntry?),
+      ),
       GoRoute(path: Routes.profile, builder: (_, _) => const ProfileScreen()),
     ],
   );
