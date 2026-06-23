@@ -91,38 +91,6 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                       month: now.month,
                       entryDays: entryDays,
                     ),
-                    const SizedBox(height: AppSpacing.stackMd),
-                    const Divider(color: Color(0x33FFFFFF), height: 1),
-                    const SizedBox(height: AppSpacing.stackMd),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '이번 달 총 ${monthEntries.length}개의 감정 수집',
-                          style: AppTextStyles.labelMedium,
-                        ),
-                        SizedBox(
-                          width: 56,
-                          height: 24,
-                          child: Stack(
-                            children: const [
-                              Positioned(
-                                left: 0,
-                                child: _Dot(AppColors.tertiary),
-                              ),
-                              Positioned(
-                                left: 16,
-                                child: _Dot(AppColors.secondary),
-                              ),
-                              Positioned(
-                                left: 32,
-                                child: _Dot(AppColors.primary),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -258,21 +226,6 @@ class _Label extends StatelessWidget {
     child: Opacity(
       opacity: 0.5,
       child: Text(text, style: AppTextStyles.labelMedium),
-    ),
-  );
-}
-
-class _Dot extends StatelessWidget {
-  const _Dot(this.color);
-  final Color color;
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 24,
-    height: 24,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: color,
-      border: Border.all(color: Colors.white, width: 1.5),
     ),
   );
 }
