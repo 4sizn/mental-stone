@@ -9,8 +9,8 @@ import '../../widgets/journal_summary_card.dart';
 
 /// Screen 06 — My Stone Records (the "jewelry box" collection).
 ///
-/// v1 keeps the designed visualization as a showcase; wiring the calendar to
-/// real aggregates is a follow-up.
+/// The month grid, the collected-count, and the summary list are all driven by
+/// the signed-in user's real entries for the current month.
 class RecordsScreen extends ConsumerStatefulWidget {
   const RecordsScreen({super.key, this.showBottomNav = true});
 
@@ -25,49 +25,21 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
     final entries =
         ref.watch(journalEntriesProvider).valueOrNull ?? const <JournalEntry>[];
-    final summaries = <Widget>[];
-    if (entries.isNotEmpty) {
-      for (var i = 0; i < entries.length && i < 8; i++) {
-        if (i > 0) summaries.add(const SizedBox(height: AppSpacing.stackMd));
-        summaries.add(JournalSummaryCard(
-          entry: entries[i],
-          accent: kEntryAccents[i % kEntryAccents.length],
-          tint: kEntryTints[i % kEntryTints.length],
-        ));
-      }
-    } else {
-      // No real records yet — keep the sample summaries as filler.
-      summaries.addAll([
-        _summary(
-          '6월 7일 금요일',
-          '오후 11:30',
-          '오늘은 유난히 차분한 하루였다. 복잡했던 생각들이 저녁 노을과 함께 가라앉는 기분이었다.',
-          AppColors.tertiary,
-          AppColors.tertiaryFixed,
-          const ['#차분함', '#사색'],
-        ),
-        const SizedBox(height: AppSpacing.stackMd),
-        _summary(
-          '6월 6일 목요일',
-          '오후 10:15',
-          '프로젝트 결과가 좋아서 정말 기뻤던 날. 친구들과 맛있는 저녁을 먹으며 에너지를 얻었다.',
-          AppColors.secondary,
-          AppColors.secondaryFixed,
-          const ['#활기찬', '#성취감'],
-        ),
-        const SizedBox(height: AppSpacing.stackMd),
-        _summary(
-          '6월 4일 화요일',
-          '오전 08:20',
-          '조금은 몽롱한 아침. 어제 읽다 만 소설의 여운이 가시지 않아 침대에서 조금 더 뒹굴거렸다.',
-          AppColors.primary,
-          AppColors.surfaceVariant,
-          const ['#몽상', '#평온'],
-        ),
-      ]);
-    }
+
+    // This month's entries (newest first, as delivered by the provider).
+    final monthEntries = entries.where((e) {
+      final d = e.createdAt.toLocal();
+      return d.year == now.year && d.month == now.month;
+    }).toList();
+
+    // Days that have at least one entry → drives the filled stones.
+    final entryDays = <int>{
+      for (final e in monthEntries) e.createdAt.toLocal().day,
+    };
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -92,7 +64,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                     children: [
                       Text('My Collection', style: AppTextStyles.labelMedium),
                       Text(
-                        '6월 누적 기록',
+                        '${now.month}월 누적 기록',
                         style: AppTextStyles.headlineLargeMobile,
                       ),
                     ],
@@ -114,29 +86,10 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    GridView.count(
-                      crossAxisCount: 4,
-                      mainAxisSpacing: AppSpacing.gutter,
-                      crossAxisSpacing: AppSpacing.gutter,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: const [
-                        _Label('S'), _Label('M'), _Label('T'), _Label('W'),
-                        _StoneCell(day: '01', color: AppColors.tertiary),
-                        _StoneCell(day: '02', color: AppColors.secondary),
-                        _StoneCell(day: '03'), // empty
-                        _StoneCell(day: '04', color: AppColors.primary),
-                        _StoneCell(day: '05'),
-                        _StoneCell(
-                          day: '06',
-                          color: AppColors.tertiaryFixedDim,
-                        ),
-                        _StoneCell(
-                          day: '07',
-                          color: AppColors.secondaryFixedDim,
-                        ),
-                        _StoneCell(day: '08', color: AppColors.outline),
-                      ],
+                    _MonthStoneGrid(
+                      year: now.year,
+                      month: now.month,
+                      entryDays: entryDays,
                     ),
                     const SizedBox(height: AppSpacing.stackMd),
                     const Divider(color: Color(0x33FFFFFF), height: 1),
@@ -145,7 +98,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '이번 달 총 22개의 감정 수집',
+                          '이번 달 총 ${monthEntries.length}개의 감정 수집',
                           style: AppTextStyles.labelMedium,
                         ),
                         SizedBox(
@@ -176,7 +129,18 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
               const SizedBox(height: AppSpacing.stackLg),
               Text('최근 일기 요약', style: AppTextStyles.labelMedium),
               const SizedBox(height: AppSpacing.stackMd),
-              ...summaries,
+              if (monthEntries.isEmpty)
+                const _EmptyRecords()
+              else
+                for (var i = 0; i < monthEntries.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.stackMd),
+                    child: JournalSummaryCard(
+                      entry: monthEntries[i],
+                      accent: kEntryAccents[i % kEntryAccents.length],
+                      tint: kEntryTints[i % kEntryTints.length],
+                    ),
+                  ),
             ],
           ),
           if (widget.showBottomNav)
@@ -232,89 +196,56 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
       ),
     );
   }
+}
 
-  Widget _summary(
-    String date,
-    String time,
-    String body,
-    Color accent,
-    Color tint,
-    List<String> tags,
-  ) {
-    return GlassCard(
-      borderRadius: AppRadii.rXl,
-      onTap: () => context.push(Routes.diary),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: tint.withValues(alpha: 0.3),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.elliptical(26, 26),
-                topRight: Radius.elliptical(38, 26),
-                bottomRight: Radius.elliptical(45, 38),
-                bottomLeft: Radius.elliptical(19, 38),
-              ),
-            ),
-            child: Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: accent.withValues(alpha: 0.9),
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.gutter),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      date,
-                      style: AppTextStyles.labelMedium.copyWith(
-                        letterSpacing: 0,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
-                      ),
-                    ),
-                    Text(
-                      time,
-                      style: AppTextStyles.labelMedium.copyWith(
-                        fontSize: 12,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  body,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodyMedium,
-                ),
-                const SizedBox(height: AppSpacing.stackSm),
-                Row(
-                  children: [
-                    for (final t in tags) ...[
-                      EmotionChip(label: t, tonal: false),
-                      const SizedBox(width: AppSpacing.stackSm),
-                    ],
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+/// A real current-month grid of collected stones. Filled cells are days with at
+/// least one entry; the rest render as empty placeholders.
+class _MonthStoneGrid extends StatelessWidget {
+  const _MonthStoneGrid({
+    required this.year,
+    required this.month,
+    required this.entryDays,
+  });
+
+  final int year;
+  final int month;
+  final Set<int> entryDays;
+
+  @override
+  Widget build(BuildContext context) {
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    // weekday: 1=Mon..7=Sun → S-first grid offset (Sun=0).
+    final leadBlanks = DateTime(year, month, 1).weekday % 7;
+
+    final cells = <Widget>[
+      for (var i = 0; i < leadBlanks; i++) const SizedBox.shrink(),
+      for (var day = 1; day <= daysInMonth; day++)
+        _StoneCell(
+          day: day,
+          color: entryDays.contains(day)
+              ? kEntryAccents[day % kEntryAccents.length]
+              : null,
+        ),
+    ];
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            for (final w in const ['S', 'M', 'T', 'W', 'T', 'F', 'S'])
+              Expanded(child: _Label(w)),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.stackSm),
+        GridView.count(
+          crossAxisCount: 7,
+          mainAxisSpacing: AppSpacing.gutter,
+          crossAxisSpacing: AppSpacing.gutter,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: cells,
+        ),
+      ],
     );
   }
 }
@@ -349,7 +280,7 @@ class _Dot extends StatelessWidget {
 /// A single collected (or empty) day stone in the grid.
 class _StoneCell extends StatelessWidget {
   const _StoneCell({required this.day, this.color});
-  final String day;
+  final int day;
   final Color? color;
 
   @override
@@ -380,11 +311,7 @@ class _StoneCell extends StatelessWidget {
                 ),
               ),
               child: empty
-                  ? Icon(
-                      Icons.question_mark,
-                      size: 18,
-                      color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
-                    )
+                  ? const SizedBox.shrink()
                   : FractionallySizedBox(
                       widthFactor: 0.6,
                       heightFactor: 0.6,
@@ -400,13 +327,34 @@ class _StoneCell extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          day,
+          day.toString().padLeft(2, '0'),
           style: AppTextStyles.labelMedium.copyWith(
             fontSize: 10,
             letterSpacing: 0,
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Shown when the current month has no recorded entries yet.
+class _EmptyRecords extends StatelessWidget {
+  const _EmptyRecords();
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        children: [
+          const Icon(
+            Icons.auto_awesome_outlined,
+            color: AppColors.onSurfaceVariant,
+            size: 28,
+          ),
+          const SizedBox(height: AppSpacing.stackSm),
+          Text('이번 달 수집한 감정 스톤이 아직 없어요', style: AppTextStyles.bodyMedium),
+        ],
+      ),
     );
   }
 }
