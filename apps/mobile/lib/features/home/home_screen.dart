@@ -5,19 +5,41 @@ import 'package:mental_stone_core/mental_stone_core.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
 
 import '../../router/app_router.dart';
+import '../../widgets/journal_summary_card.dart';
 
-/// Screen 01 — Home / My Journey. The "TODAY'S STATE" stone is decorative;
-/// "Recent Records" is backed by the user's real journal entries.
-class HomeScreen extends ConsumerWidget {
+/// Screen 01 — Home / My Journey. The date strip selects a day; the central
+/// stone reflects that day — its recorded entry when one exists, or the
+/// default resting state when the day is blank. "Recent Records" is backed by
+/// the user's real journal entries.
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key, this.showBottomNav = true});
 
   /// Set false when hosted inside [MainShell] (which owns the nav).
   final bool showBottomNav;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  int _selectedDay = DateTime.now().day;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
     final entriesAsync = ref.watch(journalEntriesProvider);
     final profile = ref.watch(myProfileProvider).valueOrNull;
+    final entries = entriesAsync.valueOrNull ?? const <JournalEntry>[];
+
+    // day → that day's entries (newest first, as the provider sorts them).
+    final entriesByDay = <int, List<JournalEntry>>{};
+    for (final e in entries) {
+      final d = e.createdAt.toLocal();
+      if (d.year == now.year && d.month == now.month) {
+        (entriesByDay[d.day] ??= <JournalEntry>[]).add(e);
+      }
+    }
+    final selectedEntries = entriesByDay[_selectedDay];
 
     final recent = entriesAsync.when<List<Widget>>(
       loading: () => const [
@@ -57,30 +79,19 @@ class HomeScreen extends ConsumerWidget {
               150,
             ),
             children: [
-              const _DateStrip(),
-              const SizedBox(height: AppSpacing.stackLg),
-              Center(
-                child: EmotionStone(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "TODAY'S STATE",
-                        style: AppTextStyles.labelMedium.copyWith(
-                          letterSpacing: 1.6,
-                          color: AppColors.onSurfaceVariant.withValues(
-                            alpha: 0.8,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text('Balanced', style: AppTextStyles.displayLarge),
-                    ],
-                  ),
-                ),
+              _DateStrip(
+                selectedDay: _selectedDay,
+                entriesByDay: entriesByDay,
+                onSelect: (d) => setState(() => _selectedDay = d),
               ),
-              const SizedBox(height: AppSpacing.stackMd),
-              const _StoneCaption(),
+              const SizedBox(height: AppSpacing.stackLg),
+              _DayState(
+                year: now.year,
+                month: now.month,
+                day: _selectedDay,
+                isToday: _selectedDay == now.day,
+                entries: selectedEntries,
+              ),
               const SizedBox(height: AppSpacing.stackLg),
               GlassButton(
                 label: '기록하기',
@@ -108,13 +119,113 @@ class HomeScreen extends ConsumerWidget {
               ...recent,
             ],
           ),
-          if (showBottomNav)
+          if (widget.showBottomNav)
             const Align(
               alignment: Alignment.bottomCenter,
               child: GlassBottomNav(active: NavItem.home),
             ),
         ],
       ),
+    );
+  }
+}
+
+/// The central stone for the selected day. With an entry it shows that day's
+/// recorded reflection (date · time, a short title) and tints the stone with
+/// the day's accent; blank days fall back to the default resting state.
+class _DayState extends StatelessWidget {
+  const _DayState({
+    required this.year,
+    required this.month,
+    required this.day,
+    required this.isToday,
+    required this.entries,
+  });
+
+  final int year;
+  final int month;
+  final int day;
+  final bool isToday;
+  final List<JournalEntry>? entries;
+
+  static String _title(String body) {
+    if (body.isEmpty) return '감정 기록';
+    final first = body.split('\n').first.trim();
+    return first.length <= 12 ? first : '${first.substring(0, 12)}…';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dayEntries = entries;
+    final labelStyle = AppTextStyles.labelMedium.copyWith(
+      letterSpacing: 1.6,
+      color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
+    );
+
+    // Today always shows the default resting state; blank days do too.
+    if (isToday || dayEntries == null || dayEntries.isEmpty) {
+      return Column(
+        children: [
+          Center(
+            child: EmotionStone(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    isToday ? "TODAY'S STATE" : '$month월 $day일',
+                    style: labelStyle,
+                  ),
+                  const SizedBox(height: 4),
+                  Text('Balanced', style: AppTextStyles.displayLarge),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.stackMd),
+          const _StoneCaption(),
+        ],
+      );
+    }
+
+    // Recorded day → that day's reflection.
+    final e = dayEntries.first;
+    final accent = kEntryAccents[day % kEntryAccents.length];
+    final tint = kEntryTints[day % kEntryTints.length];
+    final more = dayEntries.length - 1;
+    final body = e.body?.trim() ?? '';
+
+    return Column(
+      children: [
+        Center(
+          child: EmotionStone(
+            blobs: [tint, accent],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('$month월 $day일', style: labelStyle),
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    _title(body),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.headlineLargeMobile,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.stackMd),
+        Center(
+          child: Text(
+            more > 0
+                ? '${formatEntryTime(e.createdAt)} · 외 $more개의 기록'
+                : formatEntryTime(e.createdAt),
+            style: AppTextStyles.bodyMedium,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -280,15 +391,25 @@ class _StoneCaption extends StatelessWidget {
   }
 }
 
-/// Horizontal date strip for the current month. Highlights today, marks days
-/// that have a journal entry, and auto-scrolls so today is in view.
-class _DateStrip extends ConsumerStatefulWidget {
-  const _DateStrip();
+/// Horizontal date strip for the current month. Tapping a day selects it (the
+/// central stone reflects the selection); recorded days show a marker dot.
+/// Auto-scrolls so today is in view on first paint.
+class _DateStrip extends StatefulWidget {
+  const _DateStrip({
+    required this.selectedDay,
+    required this.entriesByDay,
+    required this.onSelect,
+  });
+
+  final int selectedDay;
+  final Map<int, List<JournalEntry>> entriesByDay;
+  final void Function(int day) onSelect;
+
   @override
-  ConsumerState<_DateStrip> createState() => _DateStripState();
+  State<_DateStrip> createState() => _DateStripState();
 }
 
-class _DateStripState extends ConsumerState<_DateStrip> {
+class _DateStripState extends State<_DateStrip> {
   static const _dow = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   static const _itemExtent = 72.0; // 56 chip + 16 gutter
   final _controller = ScrollController();
@@ -316,14 +437,6 @@ class _DateStripState extends ConsumerState<_DateStrip> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-    final entries =
-        ref.watch(journalEntriesProvider).valueOrNull ?? const <JournalEntry>[];
-    final entryDays = <int>{
-      for (final e in entries)
-        if (e.createdAt.toLocal().year == now.year &&
-            e.createdAt.toLocal().month == now.month)
-          e.createdAt.toLocal().day,
-    };
 
     return SizedBox(
       height: 88,
@@ -335,50 +448,65 @@ class _DateStripState extends ConsumerState<_DateStrip> {
         itemBuilder: (_, i) {
           final day = i + 1;
           final date = DateTime(now.year, now.month, day);
-          final active = day == now.day;
-          final hasEntry = entryDays.contains(day);
+          final isToday = day == now.day;
+          final hasEntry = widget.entriesByDay[day]?.isNotEmpty ?? false;
+          // Only days with a record (and today, for the default view) are
+          // selectable; empty days are dimmed and inert.
+          final selectable = hasEntry || isToday;
+          final selected = day == widget.selectedDay;
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.gutter),
-            child: Container(
-              width: 56,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: active
-                    ? AppColors.primary
-                    : Colors.white.withValues(alpha: 0.2),
-                borderRadius: AppRadii.rXxl,
-                border: active
-                    ? null
-                    : Border.all(color: AppGlass.edge, width: 1),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _dow[date.weekday - 1],
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: active ? Colors.white : AppColors.onSurfaceVariant,
-                    ),
+            child: Opacity(
+              opacity: selectable ? 1.0 : 0.4,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: selectable ? () => widget.onSelect(day) : null,
+                child: Container(
+                  width: 56,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? AppColors.primary
+                        : Colors.white.withValues(alpha: 0.2),
+                    borderRadius: AppRadii.rXxl,
+                    border: selected
+                        ? null
+                        : Border.all(color: AppGlass.edge, width: 1),
                   ),
-                  Text(
-                    '$day',
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      color: active ? Colors.white : AppColors.onSurfaceVariant,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _dow[date.weekday - 1],
+                        style: AppTextStyles.labelMedium.copyWith(
+                          color: selected
+                              ? Colors.white
+                              : AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        '$day',
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          color: selected
+                              ? Colors.white
+                              : AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Container(
+                        width: 5,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: hasEntry
+                              ? (selected ? Colors.white : AppColors.primary)
+                              : Colors.transparent,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 3),
-                  Container(
-                    width: 5,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: hasEntry
-                          ? (active ? Colors.white : AppColors.primary)
-                          : Colors.transparent,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           );
