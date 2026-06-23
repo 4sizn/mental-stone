@@ -67,7 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.recordsByEmotion,
         builder: (_, state) =>
-            RecordsByEmotionScreen(emotion: state.extra as Emotion),
+            RecordsByEmotionScreen(emotion: state.extra as Emotion?),
       ),
       GoRoute(path: Routes.profile, builder: (_, _) => const ProfileScreen()),
     ],

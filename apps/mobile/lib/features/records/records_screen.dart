@@ -53,18 +53,24 @@ class RecordsScreen extends ConsumerWidget {
                 trailing: '$collected / ${Emotion.values.length} 수집',
               ),
               const SizedBox(height: AppSpacing.stackSm),
-              GridView.count(
-                crossAxisCount: 4,
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: AppSpacing.stackSm,
-                crossAxisSpacing: AppSpacing.stackSm,
-                childAspectRatio: 0.82,
-                children: [
-                  for (final e in Emotion.values)
-                    _StoneCell(emotion: e, count: counts[e] ?? 0),
-                ],
+              // 4-up grid via Wrap so each tile sizes to its own content
+              // height — avoids overflow under large text scale / narrow widths.
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  const spacing = AppSpacing.stackSm;
+                  final itemWidth = (constraints.maxWidth - spacing * 3) / 4;
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: AppSpacing.stackMd,
+                    children: [
+                      for (final e in Emotion.values)
+                        SizedBox(
+                          width: itemWidth,
+                          child: _StoneCell(emotion: e, count: counts[e] ?? 0),
+                        ),
+                    ],
+                  );
+                },
               ),
 
               // Future sub-sections stack here (e.g. 최근 기록, 통계 …).

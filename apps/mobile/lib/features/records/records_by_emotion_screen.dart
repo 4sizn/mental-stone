@@ -9,13 +9,32 @@ import 'records_providers.dart';
 import 'records_screen.dart' show StoneBadge;
 
 /// Every record that contains a given [emotion] stone.
+///
+/// [emotion] may be null when the route is restored/deep-linked without its
+/// `extra` payload; in that case we fall back to a "no records" view rather
+/// than crashing.
 class RecordsByEmotionScreen extends ConsumerWidget {
   const RecordsByEmotionScreen({super.key, required this.emotion});
 
-  final Emotion emotion;
+  final Emotion? emotion;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final emotion = this.emotion;
+    if (emotion == null) {
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.transparent,
+        appBar: MentalStoneAppBar(back: true, onLeading: () => context.pop()),
+        body: Stack(
+          children: [
+            const EtherealBackground(variant: AuraVariant.records),
+            Center(child: _empty()),
+          ],
+        ),
+      );
+    }
+
     final entries = ref.watch(recordsByEmotionProvider(emotion));
     final topPad = MediaQuery.paddingOf(context).top + 52;
 
