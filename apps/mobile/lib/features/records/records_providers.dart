@@ -6,14 +6,7 @@ import 'package:mental_stone_core/mental_stone_core.dart';
 // driven by deterministic placeholder data. When emotions are saved, compute
 // counts/records from `journalEntriesProvider` here and the UI stays unchanged.
 
-/// An emotion stone and how many times it has appeared across records.
-class EmotionStoneCount {
-  const EmotionStoneCount(this.emotion, this.count);
-  final Emotion emotion;
-  final int count;
-}
-
-/// Placeholder occurrence counts per emotion, newest-collected first.
+/// Placeholder occurrence counts per emotion (absent = not yet collected).
 const Map<Emotion, int> _mockCounts = {
   Emotion.anger: 12,
   Emotion.annoyed: 9,
@@ -27,13 +20,9 @@ const Map<Emotion, int> _mockCounts = {
   Emotion.powerless: 1,
 };
 
-/// Stones the user has "collected", sorted by count desc. (Placeholder.)
-final emotionStoneCountsProvider = Provider<List<EmotionStoneCount>>((ref) {
-  final list = _mockCounts.entries
-      .map((e) => EmotionStoneCount(e.key, e.value))
-      .toList();
-  list.sort((a, b) => b.count.compareTo(a.count));
-  return list;
+/// Count for every emotion in catalog order (0 when not yet collected).
+final emotionCountsProvider = Provider<Map<Emotion, int>>((ref) {
+  return {for (final e in Emotion.values) e: _mockCounts[e] ?? 0};
 });
 
 /// The records that contain a given emotion. (Placeholder sample entries.)

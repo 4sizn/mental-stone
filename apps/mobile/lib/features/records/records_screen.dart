@@ -9,9 +9,9 @@ import 'records_providers.dart';
 
 /// Screen 06 — My Stone Collection.
 ///
-/// A sectioned overview. The "감정 스톤" section is a compact horizontal rail
-/// (counts per emotion; tap → that emotion's records). It deliberately stays
-/// shallow so future sub-sections can stack below it.
+/// A sectioned overview. The "감정 스톤" section is a 4-column collection grid
+/// of all emotions (count per collected stone; tap → that emotion's records).
+/// Other sub-sections can stack below it.
 class RecordsScreen extends ConsumerWidget {
   const RecordsScreen({super.key, this.showBottomNav = true});
 
@@ -21,7 +21,8 @@ class RecordsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(myProfileProvider).valueOrNull;
-    final stones = ref.watch(emotionStoneCountsProvider);
+    final counts = ref.watch(emotionCountsProvider);
+    final collected = counts.values.where((c) => c > 0).length;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -46,22 +47,25 @@ class RecordsScreen extends ConsumerWidget {
               Text('Records', style: AppTextStyles.headlineLargeMobile),
               const SizedBox(height: AppSpacing.stackLg),
 
-              // ── Section: 감정 스톤 (compact horizontal rail) ──
-              _SectionHeader(title: '감정 스톤', trailing: '${stones.length}종 수집'),
-              const SizedBox(height: AppSpacing.stackMd),
-              if (stones.isEmpty)
-                const _EmptyStones()
-              else
-                SizedBox(
-                  height: 132,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: stones.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(width: AppSpacing.stackMd),
-                    itemBuilder: (_, i) => _StoneTile(stone: stones[i]),
-                  ),
-                ),
+              // ── Section: 감정 스톤 (4-column collection grid) ──
+              _SectionHeader(
+                title: '감정 스톤',
+                trailing: '$collected / ${Emotion.values.length} 수집',
+              ),
+              const SizedBox(height: AppSpacing.stackSm),
+              GridView.count(
+                crossAxisCount: 4,
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: AppSpacing.stackSm,
+                crossAxisSpacing: AppSpacing.stackSm,
+                childAspectRatio: 0.82,
+                children: [
+                  for (final e in Emotion.values)
+                    _StoneCell(emotion: e, count: counts[e] ?? 0),
+                ],
+              ),
 
               // Future sub-sections stack here (e.g. 최근 기록, 통계 …).
             ],
@@ -101,47 +105,52 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-/// Compact tile in the horizontal stone rail.
-class _StoneTile extends StatelessWidget {
-  const _StoneTile({required this.stone});
-  final EmotionStoneCount stone;
+/// One stone in the collection grid. Collected stones are full-color and
+/// tappable; not-yet-collected ones are dimmed and inert.
+class _StoneCell extends StatelessWidget {
+  const _StoneCell({required this.emotion, required this.count});
+  final Emotion emotion;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
-    final e = stone.emotion;
-    return SizedBox(
-      width: 92,
-      child: GlassCard(
-        borderRadius: AppRadii.rXl,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-        onTap: () => context.push(Routes.recordsByEmotion, extra: e),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            StoneBadge(color: e.color, size: 48),
-            const SizedBox(height: 8),
-            Text(
-              e.nameKo,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.labelMedium.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
-                color: AppColors.onSurface,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${stone.count}회',
-              style: AppTextStyles.labelMedium.copyWith(
-                fontSize: 11,
-                letterSpacing: 0,
-                color: AppColors.primary,
-              ),
-            ),
-          ],
+    final collected = count > 0;
+    final cell = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        StoneBadge(color: emotion.color, size: 48),
+        const SizedBox(height: 6),
+        Text(
+          emotion.nameKo,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.labelMedium.copyWith(
+            fontSize: 12,
+            letterSpacing: 0,
+            fontWeight: FontWeight.w700,
+            color: AppColors.onSurface,
+          ),
         ),
-      ),
+        const SizedBox(height: 1),
+        Text(
+          collected ? '$count회' : '미수집',
+          style: AppTextStyles.labelMedium.copyWith(
+            fontSize: 10,
+            letterSpacing: 0,
+            color: collected
+                ? AppColors.primary
+                : AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+          ),
+        ),
+      ],
+    );
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: collected
+          ? () => context.push(Routes.recordsByEmotion, extra: emotion)
+          : null,
+      child: Opacity(opacity: collected ? 1 : 0.4, child: cell),
     );
   }
 }
@@ -181,26 +190,6 @@ class StoneBadge extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _EmptyStones extends StatelessWidget {
-  const _EmptyStones();
-  @override
-  Widget build(BuildContext context) {
-    return GlassCard(
-      child: Column(
-        children: [
-          const Icon(
-            Icons.auto_awesome_outlined,
-            color: AppColors.onSurfaceVariant,
-            size: 28,
-          ),
-          const SizedBox(height: AppSpacing.stackSm),
-          Text('아직 수집한 감정 스톤이 없어요', style: AppTextStyles.bodyMedium),
-        ],
       ),
     );
   }
