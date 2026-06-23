@@ -280,53 +280,106 @@ class _StoneCaption extends StatelessWidget {
   }
 }
 
-class _DateStrip extends StatelessWidget {
+/// Horizontal date strip for the current month. Highlights today, marks days
+/// that have a journal entry, and auto-scrolls so today is in view.
+class _DateStrip extends ConsumerStatefulWidget {
   const _DateStrip();
-  final _days = const [
-    ('Mon', '12', false),
-    ('Tue', '13', false),
-    ('Wed', '14', true),
-    ('Thu', '15', false),
-    ('Fri', '16', false),
-  ];
+  @override
+  ConsumerState<_DateStrip> createState() => _DateStripState();
+}
+
+class _DateStripState extends ConsumerState<_DateStrip> {
+  static const _dow = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static const _itemExtent = 72.0; // 56 chip + 16 gutter
+  final _controller = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_controller.hasClients) return;
+      final todayIndex = DateTime.now().day - 1;
+      final target = todayIndex * _itemExtent - 120;
+      _controller.jumpTo(
+        target.clamp(0.0, _controller.position.maxScrollExtent),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+    final entries =
+        ref.watch(journalEntriesProvider).valueOrNull ?? const <JournalEntry>[];
+    final entryDays = <int>{
+      for (final e in entries)
+        if (e.createdAt.toLocal().year == now.year &&
+            e.createdAt.toLocal().month == now.month)
+          e.createdAt.toLocal().day,
+    };
+
     return SizedBox(
       height: 88,
-      child: ListView.separated(
+      child: ListView.builder(
+        controller: _controller,
         scrollDirection: Axis.horizontal,
-        itemCount: _days.length,
-        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.gutter),
+        itemExtent: _itemExtent,
+        itemCount: daysInMonth,
         itemBuilder: (_, i) {
-          final (dow, num, active) = _days[i];
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: active
-                  ? AppColors.primary
-                  : Colors.white.withValues(alpha: 0.2),
-              borderRadius: AppRadii.rXxl,
-              border: active
-                  ? null
-                  : Border.all(color: AppGlass.edge, width: 1),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  dow,
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: active ? Colors.white : AppColors.onSurfaceVariant,
+          final day = i + 1;
+          final date = DateTime(now.year, now.month, day);
+          final active = day == now.day;
+          final hasEntry = entryDays.contains(day);
+          return Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.gutter),
+            child: Container(
+              width: 56,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: active
+                    ? AppColors.primary
+                    : Colors.white.withValues(alpha: 0.2),
+                borderRadius: AppRadii.rXxl,
+                border: active
+                    ? null
+                    : Border.all(color: AppGlass.edge, width: 1),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _dow[date.weekday - 1],
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: active ? Colors.white : AppColors.onSurfaceVariant,
+                    ),
                   ),
-                ),
-                Text(
-                  num,
-                  style: AppTextStyles.headlineMedium.copyWith(
-                    color: active ? Colors.white : AppColors.onSurfaceVariant,
+                  Text(
+                    '$day',
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      color: active ? Colors.white : AppColors.onSurfaceVariant,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 3),
+                  Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: hasEntry
+                          ? (active ? Colors.white : AppColors.primary)
+                          : Colors.transparent,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
