@@ -76,21 +76,13 @@ class EmotionSynthesisScreen extends StatelessWidget {
                     onPressed: () => context.go(Routes.home),
                   ),
                   const SizedBox(height: AppSpacing.stackMd),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GlassButton(
-                          label: '공유하기',
-                          icon: Icons.share,
-                          variant: GlassButtonVariant.glass,
-                          pill: true,
-                          expand: true,
-                          onPressed: () {},
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.stackMd),
-                      _RoundGlass(icon: Icons.download, onTap: () {}),
-                    ],
+                  GlassButton(
+                    label: '공유하기',
+                    icon: Icons.share,
+                    variant: GlassButtonVariant.glass,
+                    pill: true,
+                    expand: true,
+                    onPressed: () {},
                   ),
                 ],
               ),
@@ -130,34 +122,6 @@ class EmotionSynthesisScreen extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _RoundGlass extends StatelessWidget {
-  const _RoundGlass({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            width: 56,
-            height: 56,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.2),
-              border: Border.all(color: AppGlass.edge, width: 1),
-            ),
-            child: Icon(icon, color: AppColors.onSurface),
-          ),
-        ),
       ),
     );
   }
