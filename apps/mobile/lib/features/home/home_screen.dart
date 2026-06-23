@@ -82,6 +82,15 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.stackMd),
               const _StoneCaption(),
               const SizedBox(height: AppSpacing.stackLg),
+              GlassButton(
+                label: '기록하기',
+                icon: Icons.add,
+                variant: GlassButtonVariant.primary,
+                pill: true,
+                expand: true,
+                onPressed: () => context.push(Routes.record),
+              ),
+              const SizedBox(height: AppSpacing.stackLg),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -215,7 +224,7 @@ class _EmptyRecords extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '+ 버튼을 눌러 첫 감정을 기록해 보세요.',
+            "'기록하기'를 눌러 첫 감정을 기록해 보세요.",
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMedium,
           ),

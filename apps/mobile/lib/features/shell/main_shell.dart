@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
 
-import '../../router/app_router.dart';
 import '../calendar/calendar_screen.dart';
 import '../home/home_screen.dart';
 import '../records/records_screen.dart';
@@ -48,15 +46,6 @@ class _MainShellState extends State<MainShell> {
           ),
         ],
       ),
-      floatingActionButton: _active == NavItem.home
-          ? FloatingActionButton(
-              backgroundColor: AppColors.onSurface,
-              foregroundColor: AppColors.surface,
-              shape: const CircleBorder(),
-              onPressed: () => context.push(Routes.record),
-              child: const Icon(Icons.add),
-            )
-          : null,
     );
   }
 }
