@@ -23,6 +23,7 @@ export 'src/auth/auth_repository.dart';
 export 'src/auth/auth_providers.dart';
 export 'src/auth/auth_controller.dart';
 export 'src/auth/auth_failure.dart';
+export 'src/emotion/emotion.dart';
 export 'src/profile/profile.dart';
 export 'src/profile/profile_repository.dart';
 export 'src/journal/journal_entry.dart';

@@ -11,6 +11,7 @@ import '../features/auth/sign_up_screen.dart';
 import '../features/diary/diary_entry_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/record/record_screen.dart';
+import '../features/records/records_by_emotion_screen.dart';
 import '../features/shell/main_shell.dart';
 import '../features/synthesis/emotion_synthesis_screen.dart';
 
@@ -23,6 +24,7 @@ abstract class Routes {
   static const analysis = '/analysis';
   static const synthesis = '/synthesis';
   static const diary = '/diary';
+  static const recordsByEmotion = '/records-by-emotion';
   static const profile = '/profile';
 
   static const _public = {signIn, signUp};
@@ -61,6 +63,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.diary,
         builder: (context, state) =>
             DiaryEntryScreen(entry: state.extra as JournalEntry?),
+      ),
+      GoRoute(
+        path: Routes.recordsByEmotion,
+        builder: (_, state) =>
+            RecordsByEmotionScreen(emotion: state.extra as Emotion),
       ),
       GoRoute(path: Routes.profile, builder: (_, _) => const ProfileScreen()),
     ],
