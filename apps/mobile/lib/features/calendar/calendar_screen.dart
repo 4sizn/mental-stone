@@ -207,14 +207,29 @@ class _MonthGrid extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.stackSm),
-          GridView.count(
-            crossAxisCount: 7,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 6,
-            crossAxisSpacing: 6,
-            children: cells,
-          ),
+          // Explicit week rows (instead of GridView) so the header→days gap
+          // and row height are predictable; cells stay ~square so day stones
+          // remain round.
+          for (var start = 0; start < cells.length; start += 7)
+            Padding(
+              padding: EdgeInsets.only(top: start == 0 ? 0 : 6),
+              child: Row(
+                children: [
+                  for (var col = 0; col < 7; col++)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: SizedBox(
+                          height: 40,
+                          child: start + col < cells.length
+                              ? cells[start + col]
+                              : const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           const SizedBox(height: AppSpacing.stackMd),
           const Divider(color: Color(0x33FFFFFF), height: 1),
           const SizedBox(height: AppSpacing.stackMd),
