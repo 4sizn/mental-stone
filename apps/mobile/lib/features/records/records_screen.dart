@@ -9,8 +9,8 @@ import 'records_providers.dart';
 
 /// Screen 06 — My Stone Collection.
 ///
-/// A sectioned overview. The "감정 스톤" section is a 4-column collection grid
-/// of all emotions (count per collected stone; tap → that emotion's records).
+/// A sectioned overview. The collection section is a 4-column grid of all
+/// emotions (count per collected stone; tap → that emotion's records).
 /// Other sub-sections can stack below it.
 class RecordsScreen extends ConsumerWidget {
   const RecordsScreen({super.key, this.showBottomNav = true});
@@ -47,10 +47,15 @@ class RecordsScreen extends ConsumerWidget {
               Text('Records', style: AppTextStyles.headlineLargeMobile),
               const SizedBox(height: AppSpacing.stackLg),
 
-              // ── Section: 감정 스톤 (4-column collection grid) ──
-              _SectionHeader(
-                title: '감정 스톤',
-                trailing: '$collected / ${Emotion.values.length} 수집',
+              // ── Section: emotion-stone collection (4-column grid) ──
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '$collected / ${Emotion.values.length} 수집',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.primaryFixedDim,
+                  ),
+                ),
               ),
               const SizedBox(height: AppSpacing.stackSm),
               // 4-up grid via Wrap so each tile sizes to its own content
@@ -83,30 +88,6 @@ class RecordsScreen extends ConsumerWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.trailing});
-  final String title;
-  final String? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(title, style: AppTextStyles.headlineMedium),
-        if (trailing != null)
-          Text(
-            trailing!,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.primaryFixedDim,
-            ),
-          ),
-      ],
     );
   }
 }
