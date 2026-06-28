@@ -7,8 +7,10 @@ import 'package:mental_stone_ui/mental_stone_ui.dart';
 
 import '../../router/app_router.dart';
 
-/// Screen 04 — Emotion Analysis. Runs a ~4s "analysis" progress, then reveals
-/// the result card. (Real AI analysis is out of v1 scope.)
+/// Screen 04 — Emotion Analysis. Runs a ~4s "AI 분석 중" progress, then
+/// advances straight to the synthesis result (which presents the final stone),
+/// so the analysis step is a transition rather than a duplicate result screen.
+/// (Real AI analysis is out of v1 scope.)
 class EmotionAnalysisScreen extends StatefulWidget {
   const EmotionAnalysisScreen({super.key});
   @override
@@ -17,7 +19,6 @@ class EmotionAnalysisScreen extends StatefulWidget {
 
 class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
   double _progress = 0;
-  bool _done = false;
   Timer? _timer;
 
   @override
@@ -26,12 +27,18 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
     const step = 40; // ms
     const total = 4000;
     _timer = Timer.periodic(const Duration(milliseconds: step), (t) {
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
       setState(() {
         _progress += step / total;
         if (_progress >= 1) {
           _progress = 1;
-          _done = true;
           t.cancel();
+          // The loader is a transition, not a destination: replace it so back
+          // from synthesis doesn't land on a finished progress bar.
+          context.pushReplacement(Routes.synthesis);
         }
       });
     });
@@ -62,12 +69,9 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
               ),
               child: Column(
                 children: [
-                  _AnalysisStone(charged: _done),
+                  _AnalysisStone(charged: _progress >= 1),
                   const SizedBox(height: AppSpacing.stackLg),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: _done ? _result() : _analyzing(),
-                  ),
+                  _analyzing(),
                 ],
               ),
             ),
@@ -79,7 +83,6 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
 
   Widget _analyzing() {
     return Column(
-      key: const ValueKey('analyzing'),
       children: [
         Text(
           'AI 감정 분석 중 (${(_progress * 100).round()}%)',
@@ -114,65 +117,6 @@ class _EmotionAnalysisScreenState extends State<EmotionAnalysisScreen> {
           style: AppTextStyles.labelMedium.copyWith(
             color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _result() {
-    return Column(
-      key: const ValueKey('result'),
-      children: [
-        GlassCard(
-          borderRadius: AppRadii.rXxl,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '분석 결과',
-                    style: AppTextStyles.headlineLargeMobile.copyWith(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  Text('오늘의 돌 조각', style: AppTextStyles.labelMedium),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.stackMd),
-              const GlowBar(
-                label: '행복',
-                value: 0.60,
-                color: AppColors.moodClarity,
-              ),
-              const SizedBox(height: AppSpacing.stackMd),
-              const GlowBar(
-                label: '기대',
-                value: 0.25,
-                color: AppColors.moodVitality,
-              ),
-              const SizedBox(height: AppSpacing.stackMd),
-              const GlowBar(label: '불안', value: 0.15, color: Colors.white),
-              const SizedBox(height: AppSpacing.stackMd),
-              Text(
-                '"오늘 당신의 마음은 맑은 하늘 아래 살랑이는 바람 같습니다. '
-                '작은 기대가 행복을 더 선명하게 만들고 있네요."',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: AppColors.onSurface,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.stackLg),
-        GlassButton(
-          label: '스톤 생성 완료',
-          variant: GlassButtonVariant.glass,
-          pill: true,
-          onPressed: () => context.push(Routes.synthesis),
         ),
       ],
     );
