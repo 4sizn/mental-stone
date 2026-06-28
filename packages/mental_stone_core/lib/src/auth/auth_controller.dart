@@ -46,6 +46,16 @@ class AuthController extends AutoDisposeAsyncNotifier<void> {
       () => ref.read(authRepositoryProvider).signOut(),
     );
   }
+
+  /// Permanently deletes the account. Returns true on success; on failure the
+  /// state carries the error so callers can surface a message.
+  Future<bool> deleteAccount() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(authRepositoryProvider).deleteAccount(),
+    );
+    return !state.hasError;
+  }
 }
 
 final authControllerProvider =

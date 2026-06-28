@@ -52,6 +52,16 @@ class AuthRepository {
 
   Future<void> signOut() => _auth.signOut();
 
+  /// Permanently deletes the current user's account and all their data.
+  ///
+  /// Calls the `delete_account` RPC (a SECURITY DEFINER function that deletes
+  /// the caller's `auth.users` row, cascading to profiles and journal entries),
+  /// then signs out locally so the router redirects to the auth flow.
+  Future<void> deleteAccount() async {
+    await _client.rpc('delete_account');
+    await _auth.signOut();
+  }
+
   // ── v2: native Kakao login ─────────────────────────────────────────────
   // Future<AuthResponse> signInWithKakao() async {
   //   // Requires: kakao_flutter_sdk_user, OIDC enabled on the Kakao app,

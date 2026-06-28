@@ -4,20 +4,66 @@ import 'package:go_router/go_router.dart';
 import 'package:mental_stone_core/mental_stone_core.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
 
-class ProfileScreen extends ConsumerWidget {
+/// Which auth action is currently in flight, so a failure shows the right
+/// message and the spinner sits on the button that was pressed.
+enum _ProfileAction { none, signOut, delete }
+
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  _ProfileAction _action = _ProfileAction.none;
+
+  Future<void> _confirmAndDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('정말 탈퇴하시겠어요?'),
+        content: const Text(
+          '계정과 모든 감정 기록이 영구적으로 삭제되며, 되돌릴 수 없습니다.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('탈퇴하기'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _action = _ProfileAction.delete);
+    await ref.read(authControllerProvider.notifier).deleteAccount();
+    // On success the session ends and the router redirects away from here;
+    // on failure the listener below surfaces a message.
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profileAsync = ref.watch(myProfileProvider);
     final user = ref.watch(currentUserProvider);
     final busy = ref.watch(authControllerProvider).isLoading;
+    final signingOut = busy && _action != _ProfileAction.delete;
+    final deleting = busy && _action == _ProfileAction.delete;
 
-    // Surface a sign-out failure (sign-in/up errors are shown on their screens).
+    // Surface a sign-out / delete failure (sign-in/up errors show on their
+    // own screens). The message depends on which action was attempted.
     ref.listen(authControllerProvider, (prev, next) {
       if (next.hasError && context.mounted) {
+        final message = _action == _ProfileAction.delete
+            ? '회원 탈퇴에 실패했어요. 다시 시도해 주세요.'
+            : '로그아웃에 실패했어요. 다시 시도해 주세요.';
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('로그아웃에 실패했어요. 다시 시도해 주세요.')),
+          SnackBar(content: Text(message)),
         );
       }
     });
@@ -94,10 +140,31 @@ class ProfileScreen extends ConsumerWidget {
                 variant: GlassButtonVariant.glass,
                 pill: true,
                 expand: true,
-                loading: busy,
+                loading: signingOut,
                 onPressed: busy
                     ? null
-                    : () => ref.read(authControllerProvider.notifier).signOut(),
+                    : () {
+                        setState(() => _action = _ProfileAction.signOut);
+                        ref.read(authControllerProvider.notifier).signOut();
+                      },
+              ),
+              const SizedBox(height: AppSpacing.stackSm),
+              TextButton.icon(
+                onPressed: busy ? null : _confirmAndDelete,
+                icon: deleting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.error,
+                        ),
+                      )
+                    : const Icon(Icons.person_remove_outlined, size: 18),
+                label: const Text('회원 탈퇴'),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.error,
+                ),
               ),
             ],
           ),
