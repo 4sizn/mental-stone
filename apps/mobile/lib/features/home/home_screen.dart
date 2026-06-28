@@ -41,25 +41,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     final selectedEntries = entriesByDay[_selectedDay];
 
-    final recent = entriesAsync.when<List<Widget>>(
-      loading: () => const [
-        Padding(
-          padding: EdgeInsets.only(top: 24),
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ],
-      error: (_, _) => [const _MessageCard('기록을 불러오지 못했어요.')],
-      data: (entries) => entries.isEmpty
-          ? [const _EmptyRecords()]
-          : [
-              for (final e in entries.take(6))
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.stackMd),
-                  child: _EntryCard(entry: e),
-                ),
-            ],
-    );
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -101,22 +82,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 expand: true,
                 onPressed: () => context.push(Routes.record),
               ),
-              const SizedBox(height: AppSpacing.stackLg),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('Recent Records', style: AppTextStyles.headlineMedium),
-                  Text(
-                    'View All',
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.primaryFixedDim,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.stackMd),
-              ...recent,
             ],
           ),
           if (widget.showBottomNav)
@@ -228,129 +193,6 @@ class _DayState extends StatelessWidget {
       ],
     );
   }
-}
-
-String _formatWhen(DateTime dt) {
-  final now = DateTime.now();
-  final d = now.difference(dt);
-  if (d.inMinutes < 1) return '방금';
-  if (d.inMinutes < 60) return '${d.inMinutes}분 전';
-  if (d.inHours < 24) return '${d.inHours}시간 전';
-  if (d.inDays < 7) return '${d.inDays}일 전';
-  return '${dt.month}월 ${dt.day}일';
-}
-
-class _EntryCard extends StatelessWidget {
-  const _EntryCard({required this.entry});
-  final JournalEntry entry;
-
-  @override
-  Widget build(BuildContext context) {
-    final title = (entry.mood?.trim().isNotEmpty ?? false)
-        ? entry.mood!.trim()
-        : '오늘의 기록';
-    final body = entry.body?.trim() ?? '';
-    return GlassCard(
-      borderRadius: AppRadii.rXl,
-      onTap: () => context.push(Routes.diary, extra: entry),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.tertiaryFixed.withValues(alpha: 0.35),
-              borderRadius: AppRadii.rXl,
-              border: Border.all(
-                color: AppColors.tertiary.withValues(alpha: 0.2),
-              ),
-            ),
-            child: const Icon(
-              Icons.auto_awesome,
-              color: AppColors.tertiary,
-              size: 26,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.gutter),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.onSurface,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _formatWhen(entry.createdAt),
-                      style: AppTextStyles.labelMedium,
-                    ),
-                  ],
-                ),
-                if (body.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    body,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.bodyMedium,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyRecords extends StatelessWidget {
-  const _EmptyRecords();
-  @override
-  Widget build(BuildContext context) {
-    return GlassCard(
-      child: Column(
-        children: [
-          const Icon(
-            Icons.spa_outlined,
-            color: AppColors.onSurfaceVariant,
-            size: 32,
-          ),
-          const SizedBox(height: AppSpacing.stackSm),
-          Text(
-            '아직 기록이 없어요',
-            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "'기록하기'를 눌러 첫 감정을 기록해 보세요.",
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MessageCard extends StatelessWidget {
-  const _MessageCard(this.text);
-  final String text;
-  @override
-  Widget build(BuildContext context) =>
-      GlassCard(child: Text(text, style: AppTextStyles.bodyMedium));
 }
 
 class _StoneCaption extends StatelessWidget {
