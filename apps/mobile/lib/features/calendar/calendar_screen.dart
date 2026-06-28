@@ -32,6 +32,18 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     setState(() => _month = DateTime(_month.year, _month.month + delta));
   }
 
+  Future<void> _pickMonth() async {
+    final picked = await showDialog<DateTime>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.25),
+      builder: (_) =>
+          _MonthYearPickerDialog(selected: _month, now: DateTime.now()),
+    );
+    if (picked != null) {
+      setState(() => _month = DateTime(picked.year, picked.month));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(myProfileProvider).valueOrNull;
@@ -94,15 +106,36 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          '${_month.year}년 ${_month.month}월',
-                          style: AppTextStyles.headlineLargeMobile,
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _pickMonth,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '${_month.year}년 ${_month.month}월',
+                                style: AppTextStyles.headlineLargeMobile,
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.expand_more,
+                                color: AppColors.onSurface,
+                                size: 24,
+                              ),
+                            ],
+                          ),
                         ),
                         Row(
                           children: [
-                            _round(Icons.chevron_left, () => _changeMonth(-1)),
+                            _roundGlassButton(
+                              Icons.chevron_left,
+                              () => _changeMonth(-1),
+                            ),
                             const SizedBox(width: AppSpacing.stackSm),
-                            _round(Icons.chevron_right, () => _changeMonth(1)),
+                            _roundGlassButton(
+                              Icons.chevron_right,
+                              () => _changeMonth(1),
+                            ),
                           ],
                         ),
                       ],
@@ -145,13 +178,19 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     );
   }
 
-  Widget _round(IconData icon, VoidCallback onTap) => GlassCard(
+}
+
+/// Small round glass control (month chevrons, year nav). A null [onTap] dims
+/// the button and makes it inert.
+Widget _roundGlassButton(IconData icon, VoidCallback? onTap) => Opacity(
+  opacity: onTap == null ? 0.35 : 1,
+  child: GlassCard(
     onTap: onTap,
     padding: const EdgeInsets.all(8),
     borderRadius: AppRadii.rPill,
     child: Icon(icon, color: AppColors.onSurface, size: 20),
-  );
-}
+  ),
+);
 
 class _MonthGrid extends StatelessWidget {
   const _MonthGrid({
@@ -329,6 +368,96 @@ class _Dot extends StatelessWidget {
       border: Border.all(color: Colors.white, width: 1.5),
     ),
   );
+}
+
+/// Year + month picker shown when the calendar header is tapped. Years are
+/// navigable with the chevrons (no future years); a month chip tap confirms
+/// and pops the chosen [DateTime]. Future months in the current year are
+/// disabled so a user can never land on an upcoming month.
+class _MonthYearPickerDialog extends StatefulWidget {
+  const _MonthYearPickerDialog({required this.selected, required this.now});
+
+  final DateTime selected;
+  final DateTime now;
+
+  @override
+  State<_MonthYearPickerDialog> createState() => _MonthYearPickerDialogState();
+}
+
+class _MonthYearPickerDialogState extends State<_MonthYearPickerDialog> {
+  late int _year = widget.selected.year;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = widget.now;
+    final canGoNextYear = _year < now.year;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+      child: GlassCard(
+        modal: true,
+        borderRadius: AppRadii.rCard,
+        padding: const EdgeInsets.all(AppSpacing.glassPadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Year navigation.
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _roundGlassButton(
+                  Icons.chevron_left,
+                  () => setState(() => _year--),
+                ),
+                Text('$_year년', style: AppTextStyles.headlineMedium),
+                _roundGlassButton(
+                  Icons.chevron_right,
+                  canGoNextYear ? () => setState(() => _year++) : null,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.stackMd),
+            // Month grid — 4 columns × 3 rows.
+            for (var row = 0; row < 3; row++)
+              Padding(
+                padding: EdgeInsets.only(top: row == 0 ? 0 : AppSpacing.stackSm),
+                child: Row(
+                  children: [
+                    for (var col = 0; col < 4; col++)
+                      Expanded(child: _monthChip(row * 4 + col + 1)),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _monthChip(int month) {
+    final now = widget.now;
+    final isFuture = _year == now.year && month > now.month;
+    final isSelected =
+        _year == widget.selected.year && month == widget.selected.month;
+
+    final chip = Center(
+      child: EmotionChip(
+        label: '$month월',
+        color: AppColors.primary,
+        selected: isSelected,
+        onTap: isFuture
+            ? null
+            : () => Navigator.of(context).pop(DateTime(_year, month)),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 3),
+      child: isFuture ? Opacity(opacity: 0.35, child: chip) : chip,
+    );
+  }
 }
 
 class _EmptyMonth extends StatelessWidget {
