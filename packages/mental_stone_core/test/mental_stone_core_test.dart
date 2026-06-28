@@ -28,6 +28,20 @@ void main() {
       final msg = authErrorMessage(Exception('boom'));
       expect(msg, '문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     });
+
+    test('maps a retryable fetch failure to a connectivity message', () {
+      final msg = authErrorMessage(
+        AuthRetryableFetchException(message: 'ClientException'),
+      );
+      expect(msg, '인터넷 연결을 확인해 주세요.');
+    });
+
+    test('maps a raw ClientException to a connectivity message', () {
+      final msg = authErrorMessage(
+        Exception('ClientException with SocketException: Failed host lookup'),
+      );
+      expect(msg, '인터넷 연결을 확인해 주세요.');
+    });
   });
 
   group('Profile', () {

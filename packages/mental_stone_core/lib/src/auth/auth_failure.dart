@@ -4,6 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 ///
 /// Kept free of Flutter imports so it is trivially unit-testable.
 String authErrorMessage(Object error) {
+  if (_looksLikeNetworkError(error)) {
+    return '인터넷 연결을 확인해 주세요.';
+  }
   if (error is AuthException) {
     final msg = error.message.toLowerCase();
     if (msg.contains('invalid login credentials')) {
@@ -31,4 +34,23 @@ String authErrorMessage(Object error) {
     return error.message;
   }
   return '문제가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+}
+
+/// Detects connectivity failures (no network, DNS failure, connection refused)
+/// without importing `package:http`/`dart:io`, so this stays Flutter-free.
+///
+/// Covers `ClientException` (package:http), `SocketException` (dart:io), and
+/// Supabase's retryable fetch wrapper, by matching on the error's type name
+/// and message text.
+bool _looksLikeNetworkError(Object error) {
+  if (error is AuthRetryableFetchException) return true;
+  final text = error.toString().toLowerCase();
+  return text.contains('clientexception') ||
+      text.contains('socketexception') ||
+      text.contains('failed host lookup') ||
+      text.contains('connection refused') ||
+      text.contains('connection closed') ||
+      text.contains('network is unreachable') ||
+      text.contains('connection timed out') ||
+      text.contains('software caused connection abort');
 }

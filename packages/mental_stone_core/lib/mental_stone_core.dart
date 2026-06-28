@@ -16,6 +16,7 @@ export 'package:supabase_flutter/supabase_flutter.dart'
         AuthState,
         AuthChangeEvent,
         AuthException,
+        AuthRetryableFetchException,
         OAuthProvider;
 
 export 'src/supabase/supabase_providers.dart';
