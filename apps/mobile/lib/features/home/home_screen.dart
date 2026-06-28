@@ -278,7 +278,8 @@ class _DateStripState extends State<_DateStrip> {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+    // Only show days up to (and including) today — never future days.
+    final lastDay = now.day;
 
     return SizedBox(
       height: 88,
@@ -286,7 +287,7 @@ class _DateStripState extends State<_DateStrip> {
         controller: _controller,
         scrollDirection: Axis.horizontal,
         itemExtent: _itemExtent,
-        itemCount: daysInMonth,
+        itemCount: lastDay,
         itemBuilder: (_, i) {
           final day = i + 1;
           final date = DateTime(now.year, now.month, day);
