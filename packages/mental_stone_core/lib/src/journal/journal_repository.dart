@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../auth/auth_providers.dart';
+import '../supabase/session_retry.dart';
 import '../supabase/supabase_providers.dart';
 import 'journal_entry.dart';
 
@@ -24,30 +25,36 @@ class JournalRepository {
     required String userId,
     String? mood,
     String? body,
-  }) async {
-    final row = await _client
-        .from('journal_entries')
-        .insert({'user_id': userId, 'mood': mood, 'body': body})
-        .select()
-        .single();
-    return JournalEntry.fromMap(row);
+  }) {
+    return runWithFreshSession(_client.auth, () async {
+      final row = await _client
+          .from('journal_entries')
+          .insert({'user_id': userId, 'mood': mood, 'body': body})
+          .select()
+          .single();
+      return JournalEntry.fromMap(row);
+    });
   }
 
-  Future<JournalEntry> update(String id, {String? mood, String? body}) async {
+  Future<JournalEntry> update(String id, {String? mood, String? body}) {
     final patch = <String, dynamic>{};
     if (mood != null) patch['mood'] = mood;
     if (body != null) patch['body'] = body;
-    final row = await _client
-        .from('journal_entries')
-        .update(patch)
-        .eq('id', id)
-        .select()
-        .single();
-    return JournalEntry.fromMap(row);
+    return runWithFreshSession(_client.auth, () async {
+      final row = await _client
+          .from('journal_entries')
+          .update(patch)
+          .eq('id', id)
+          .select()
+          .single();
+      return JournalEntry.fromMap(row);
+    });
   }
 
-  Future<void> delete(String id) async {
-    await _client.from('journal_entries').delete().eq('id', id);
+  Future<void> delete(String id) {
+    return runWithFreshSession(_client.auth, () async {
+      await _client.from('journal_entries').delete().eq('id', id);
+    });
   }
 }
 
