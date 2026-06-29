@@ -9,6 +9,7 @@ import '../features/analysis/emotion_analysis_screen.dart';
 import '../features/auth/sign_in_screen.dart';
 import '../features/auth/sign_up_screen.dart';
 import '../features/diary/diary_entry_screen.dart';
+import '../features/profile/profile_edit_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/record/record_screen.dart';
 import '../features/records/records_by_emotion_screen.dart';
@@ -26,6 +27,7 @@ abstract class Routes {
   static const diary = '/diary';
   static const recordsByEmotion = '/records-by-emotion';
   static const profile = '/profile';
+  static const profileEdit = '/profile/edit';
 
   static const _public = {signIn, signUp};
   static bool isPublic(String location) => _public.contains(location);
@@ -50,7 +52,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.signIn, builder: (_, _) => const SignInScreen()),
       GoRoute(path: Routes.signUp, builder: (_, _) => const SignUpScreen()),
       GoRoute(path: Routes.home, builder: (_, _) => const MainShell()),
-      GoRoute(path: Routes.record, builder: (_, _) => const RecordScreen()),
+      GoRoute(
+        path: Routes.record,
+        builder: (_, state) =>
+            RecordScreen(entry: state.extra as JournalEntry?),
+      ),
       GoRoute(
         path: Routes.analysis,
         builder: (_, _) => const EmotionAnalysisScreen(),
@@ -70,6 +76,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             RecordsByEmotionScreen(emotion: state.extra as Emotion?),
       ),
       GoRoute(path: Routes.profile, builder: (_, _) => const ProfileScreen()),
+      GoRoute(
+        path: Routes.profileEdit,
+        builder: (_, _) => const ProfileEditScreen(),
+      ),
     ],
   );
 });

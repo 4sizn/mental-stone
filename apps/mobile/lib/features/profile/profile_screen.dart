@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mental_stone_core/mental_stone_core.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
 
+import '../../router/app_router.dart';
+
 /// Which auth action is currently in flight, so a failure shows the right
 /// message and the spinner sits on the button that was pressed.
 enum _ProfileAction { none, signOut, delete }
@@ -134,6 +136,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 },
               ),
               const SizedBox(height: AppSpacing.stackLg),
+              GlassButton(
+                label: '프로필 수정',
+                icon: Icons.edit_outlined,
+                variant: GlassButtonVariant.glass,
+                pill: true,
+                expand: true,
+                onPressed: busy ? null : () => context.push(Routes.profileEdit),
+              ),
+              const SizedBox(height: AppSpacing.stackSm),
               GlassButton(
                 label: '로그아웃',
                 icon: Icons.logout,

@@ -1,10 +1,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mental_stone_core/mental_stone_core.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../router/app_router.dart';
 import '../../widgets/journal_summary_card.dart';
 
 /// Screen 02 — Diary Entry (read view). Renders a real [entry] when one is
@@ -168,7 +171,11 @@ class DiaryEntryScreen extends StatelessWidget {
                       label: 'Share Insight',
                       variant: GlassButtonVariant.glass,
                       expand: true,
-                      onPressed: () {},
+                      onPressed: () => Share.share(
+                        'The Silence of Morning\n\n'
+                        '"I woke up before the alarm today..."\n\n'
+                        '— Mental Stone',
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.stackMd),
@@ -190,7 +197,7 @@ class DiaryEntryScreen extends StatelessWidget {
 }
 
 /// Real diary view backed by a user [JournalEntry].
-class _RealDiaryView extends StatelessWidget {
+class _RealDiaryView extends ConsumerWidget {
   const _RealDiaryView({required this.entry});
   final JournalEntry entry;
 
@@ -200,8 +207,71 @@ class _RealDiaryView extends StatelessWidget {
     return firstLine.length <= 22 ? firstLine : '${firstLine.substring(0, 22)}…';
   }
 
+  /// Resolves the freshest copy of [entry] from the live list, falling back to
+  /// the route-supplied entry while the list is loading or after deletion.
+  JournalEntry _latest(WidgetRef ref) {
+    final list = ref.watch(journalEntriesProvider).valueOrNull;
+    if (list != null) {
+      for (final e in list) {
+        if (e.id == entry.id) return e;
+      }
+    }
+    return entry;
+  }
+
+  /// Text put on the system share sheet: date, optional mood, body, signature.
+  String _shareText(JournalEntry entry) {
+    final body = entry.body?.trim() ?? '';
+    final mood = entry.mood?.trim();
+    final when =
+        '${formatEntryDate(entry.createdAt)} · ${formatEntryTime(entry.createdAt)}';
+    final buffer = StringBuffer(when);
+    if (mood != null && mood.isNotEmpty) buffer.write('\n#$mood');
+    if (body.isNotEmpty) buffer.write('\n\n$body');
+    buffer.write('\n\n— Mental Stone');
+    return buffer.toString();
+  }
+
+  Future<void> _confirmAndDelete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('이 기록을 삭제할까요?'),
+        content: const Text('삭제한 감정 기록은 되돌릴 수 없어요.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('삭제하기'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    try {
+      await ref.read(journalRepositoryProvider).delete(entry.id);
+      ref.invalidate(journalEntriesProvider);
+      if (context.mounted) context.pop();
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('삭제에 실패했어요. 다시 시도해 주세요.')),
+        );
+      }
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Re-read the freshest version of this entry from the list so an in-place
+    // edit (which invalidates [journalEntriesProvider]) refreshes this view
+    // too. Falls back to the entry passed via route `extra` while the list is
+    // loading or if it's no longer present (e.g. just deleted).
+    final entry = _latest(ref);
     final body = entry.body?.trim() ?? '';
     final mood = entry.mood?.trim();
     final topPad = MediaQuery.paddingOf(context).top + 52;
@@ -212,6 +282,18 @@ class _RealDiaryView extends StatelessWidget {
         back: true,
         subtitle: 'Diary Entry',
         onLeading: () => context.pop(),
+        actions: [
+          _GlassAction(
+            icon: Icons.edit_outlined,
+            semanticLabel: '수정',
+            onTap: () => context.push(Routes.record, extra: entry),
+          ),
+          _GlassAction(
+            icon: Icons.delete_outline,
+            semanticLabel: '삭제',
+            onTap: () => _confirmAndDelete(context, ref),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -269,7 +351,7 @@ class _RealDiaryView extends StatelessWidget {
                       label: '공유하기',
                       variant: GlassButtonVariant.glass,
                       expand: true,
-                      onPressed: () {},
+                      onPressed: () => Share.share(_shareText(entry)),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.stackMd),
@@ -285,6 +367,46 @@ class _RealDiaryView extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Small round frosted button for the app bar's trailing actions (edit /
+/// delete), mirroring the back button's glass-circle style.
+class _GlassAction extends StatelessWidget {
+  const _GlassAction({
+    required this.icon,
+    required this.semanticLabel,
+    required this.onTap,
+  });
+  final IconData icon;
+  final String semanticLabel;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.28),
+                border: Border.all(color: AppGlass.edge, width: 1),
+              ),
+              child: Icon(icon, color: AppColors.onSurface, size: 22),
+            ),
+          ),
+        ),
       ),
     );
   }
