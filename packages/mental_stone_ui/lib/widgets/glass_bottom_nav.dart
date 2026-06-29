@@ -16,8 +16,12 @@ class GlassBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Float above the system navigation bar (Android 3-button/gesture insets
+    // are taller than 24px and would otherwise cover the pill). Keeps a 24px
+    // minimum so platforms with no/short inset are unaffected.
+    final safeBottom = MediaQuery.viewPaddingOf(context).bottom;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      padding: EdgeInsets.fromLTRB(24, 0, 24, safeBottom > 24 ? safeBottom : 24),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 360),
