@@ -55,7 +55,8 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
         ref.invalidate(journalEntriesProvider);
         if (mounted) context.push(Routes.analysis);
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[record.save] failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(
           context,

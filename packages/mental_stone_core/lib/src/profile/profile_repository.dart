@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../auth/auth_providers.dart';
+import '../supabase/session_retry.dart';
 import '../supabase/supabase_providers.dart';
 import 'profile.dart';
 
@@ -24,17 +25,19 @@ class ProfileRepository {
     String userId, {
     String? displayName,
     String? avatarUrl,
-  }) async {
+  }) {
     final patch = <String, dynamic>{};
     if (displayName != null) patch['display_name'] = displayName;
     if (avatarUrl != null) patch['avatar_url'] = avatarUrl;
-    final data = await _client
-        .from('profiles')
-        .update(patch)
-        .eq('id', userId)
-        .select()
-        .single();
-    return Profile.fromMap(data);
+    return runWithFreshSession(_client.auth, () async {
+      final data = await _client
+          .from('profiles')
+          .update(patch)
+          .eq('id', userId)
+          .select()
+          .single();
+      return Profile.fromMap(data);
+    });
   }
 }
 
