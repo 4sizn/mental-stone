@@ -21,6 +21,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   late DateTime _month;
   double _dragDx = 0;
 
+  /// Explicitly tapped day. Null = fall back to the default day for the month
+  /// (today for the current month, else the latest day with a record). Reset
+  /// to null whenever the month changes so the default recomputes.
+  int? _selectedDay;
+
   @override
   void initState() {
     super.initState();
@@ -29,7 +34,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   void _changeMonth(int delta) {
-    setState(() => _month = DateTime(_month.year, _month.month + delta));
+    setState(() {
+      _month = DateTime(_month.year, _month.month + delta);
+      _selectedDay = null;
+    });
   }
 
   Future<void> _pickMonth() async {
@@ -40,7 +48,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           _MonthYearPickerDialog(selected: _month, now: DateTime.now()),
     );
     if (picked != null) {
-      setState(() => _month = DateTime(picked.year, picked.month));
+      setState(() {
+        _month = DateTime(picked.year, picked.month);
+        _selectedDay = null;
+      });
     }
   }
 
@@ -49,6 +60,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     final profile = ref.watch(myProfileProvider).valueOrNull;
     final entriesAsync = ref.watch(journalEntriesProvider);
     final topPad = MediaQuery.paddingOf(context).top + 52;
+    final now = DateTime.now();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -78,6 +90,29 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 final day = e.createdAt.toLocal().day;
                 (entriesByDay[day] ??= <JournalEntry>[]).add(e);
               }
+
+              // The list is always a single day. Default (only computed when
+              // the user hasn't tapped a day):
+              //   • current month & today has records → today
+              //   • else the latest day in the month that has a record
+              //   • else (no records) → today for the current month, otherwise
+              //     null → the month-empty card.
+              final isCurrentMonth =
+                  _month.year == now.year && _month.month == now.month;
+              int? selectedDay = _selectedDay;
+              if (selectedDay == null) {
+                if (isCurrentMonth && entriesByDay.containsKey(now.day)) {
+                  selectedDay = now.day;
+                } else if (entriesByDay.isNotEmpty) {
+                  selectedDay =
+                      entriesByDay.keys.reduce((a, b) => a > b ? a : b);
+                } else if (isCurrentMonth) {
+                  selectedDay = now.day;
+                }
+              }
+              final dayEntries = selectedDay == null
+                  ? const <JournalEntry>[]
+                  : (entriesByDay[selectedDay] ?? const <JournalEntry>[]);
 
               return GestureDetector(
                 // Swipe right → previous month, swipe left → next month.
@@ -145,29 +180,39 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       year: _month.year,
                       month: _month.month,
                       entriesByDay: entriesByDay,
-                      onOpen: (entry) =>
-                          context.push(Routes.diary, extra: entry),
+                      selectedDay: selectedDay,
+                      onSelectDay: (day) =>
+                          setState(() => _selectedDay = day),
                     ),
                     const SizedBox(height: AppSpacing.stackLg),
-                    Text(
-                      '${_month.month}월 기록',
-                      style: AppTextStyles.labelMedium,
-                    ),
-                    const SizedBox(height: AppSpacing.stackMd),
-                    if (monthEntries.isEmpty)
-                      const _EmptyMonth()
-                    else
-                      for (var i = 0; i < monthEntries.length; i++)
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: AppSpacing.stackMd,
+                    if (selectedDay == null)
+                      const _EmptyState(message: '이 달의 기록이 없어요')
+                    else ...[
+                      Text(
+                        '${_month.month}월 $selectedDay일의 기록',
+                        style: AppTextStyles.labelMedium,
+                      ),
+                      const SizedBox(height: AppSpacing.stackMd),
+                      if (dayEntries.isEmpty)
+                        const _EmptyState(message: '이 날의 기록이 없어요')
+                      else
+                        // Cards share the selected day's accent so they match
+                        // that day's highlighted cell in the grid above.
+                        for (final entry in dayEntries)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppSpacing.stackMd,
+                            ),
+                            child: JournalSummaryCard(
+                              entry: entry,
+                              accent: kEntryAccents[
+                                  selectedDay % kEntryAccents.length],
+                              tint:
+                                  kEntryTints[selectedDay % kEntryTints.length],
+                              showDate: false,
+                            ),
                           ),
-                          child: JournalSummaryCard(
-                            entry: monthEntries[i],
-                            accent: kEntryAccents[i % kEntryAccents.length],
-                            tint: kEntryTints[i % kEntryTints.length],
-                          ),
-                        ),
+                    ],
                   ],
                 ),
               );
@@ -197,13 +242,15 @@ class _MonthGrid extends StatelessWidget {
     required this.year,
     required this.month,
     required this.entriesByDay,
-    required this.onOpen,
+    required this.selectedDay,
+    required this.onSelectDay,
   });
 
   final int year;
   final int month;
   final Map<int, List<JournalEntry>> entriesByDay;
-  final void Function(JournalEntry entry) onOpen;
+  final int? selectedDay;
+  final void Function(int day) onSelectDay;
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +269,8 @@ class _MonthGrid extends StatelessWidget {
           day: day,
           dayEntries: entriesByDay[day],
           accent: kEntryAccents[day % kEntryAccents.length],
-          onOpen: onOpen,
+          selected: day == selectedDay,
+          onTap: () => onSelectDay(day),
         ),
     ];
 
@@ -289,52 +337,82 @@ class _DayCell extends StatelessWidget {
     required this.day,
     required this.dayEntries,
     required this.accent,
-    required this.onOpen,
+    required this.selected,
+    required this.onTap,
   });
 
   final int day;
   final List<JournalEntry>? dayEntries;
   final Color accent;
-  final void Function(JournalEntry entry) onOpen;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final entries = dayEntries;
     final hasEntry = entries != null && entries.isNotEmpty;
+
+    const pebbleRadius = BorderRadius.only(
+      topLeft: Radius.elliptical(16, 16),
+      topRight: Radius.elliptical(22, 18),
+      bottomRight: Radius.elliptical(24, 20),
+      bottomLeft: Radius.elliptical(12, 18),
+    );
+
+    BoxDecoration? decoration;
+    if (selected && hasEntry) {
+      // Active day with records: filled accent pebble.
+      decoration = BoxDecoration(
+        borderRadius: pebbleRadius,
+        color: accent.withValues(alpha: 0.9),
+        boxShadow: [
+          BoxShadow(color: accent.withValues(alpha: 0.4), blurRadius: 10),
+        ],
+      );
+    } else if (selected) {
+      // Active empty day: neutral ring.
+      decoration = BoxDecoration(
+        borderRadius: pebbleRadius,
+        border: Border.all(color: AppColors.onSurface, width: 1.5),
+      );
+    } else if (hasEntry) {
+      // Recorded but not selected: soft accent pebble.
+      decoration = BoxDecoration(
+        borderRadius: pebbleRadius,
+        color: accent.withValues(alpha: 0.18),
+        border: Border.all(color: accent.withValues(alpha: 0.45)),
+        boxShadow: [
+          BoxShadow(color: accent.withValues(alpha: 0.25), blurRadius: 8),
+        ],
+      );
+    }
+
+    // A cell is "emphasized" when it has records or is the active day.
+    final emphasized = hasEntry || selected;
+    final Color textColor;
+    if (selected && hasEntry) {
+      textColor = AppColors.onPrimary;
+    } else if (emphasized) {
+      textColor = AppColors.onSurface;
+    } else {
+      textColor = AppColors.onSurfaceVariant.withValues(alpha: 0.5);
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      // Recorded days open that day's entry; empty days stay inert.
-      onTap: hasEntry ? () => onOpen(entries.first) : null,
+      // Tapping any day selects it (drives the single-day list below).
+      onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        decoration: hasEntry
-            ? BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.elliptical(16, 16),
-                  topRight: Radius.elliptical(22, 18),
-                  bottomRight: Radius.elliptical(24, 20),
-                  bottomLeft: Radius.elliptical(12, 18),
-                ),
-                color: accent.withValues(alpha: 0.18),
-                border: Border.all(color: accent.withValues(alpha: 0.45)),
-                boxShadow: [
-                  BoxShadow(
-                    color: accent.withValues(alpha: 0.25),
-                    blurRadius: 8,
-                  ),
-                ],
-              )
-            : null,
+        decoration: decoration,
         child: Center(
           child: Text(
             '$day',
             style: AppTextStyles.labelMedium.copyWith(
               fontSize: 11,
               letterSpacing: 0,
-              fontWeight: hasEntry ? FontWeight.w700 : FontWeight.w500,
-              color: hasEntry
-                  ? AppColors.onSurface
-                  : AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+              fontWeight: emphasized ? FontWeight.w700 : FontWeight.w500,
+              color: textColor,
             ),
           ),
         ),
@@ -457,8 +535,9 @@ class _MonthYearPickerDialogState extends State<_MonthYearPickerDialog> {
   }
 }
 
-class _EmptyMonth extends StatelessWidget {
-  const _EmptyMonth();
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.message});
+  final String message;
   @override
   Widget build(BuildContext context) {
     return GlassCard(
@@ -470,7 +549,7 @@ class _EmptyMonth extends StatelessWidget {
             size: 28,
           ),
           const SizedBox(height: AppSpacing.stackSm),
-          Text('이 달의 기록이 없어요', style: AppTextStyles.bodyMedium),
+          Text(message, style: AppTextStyles.bodyMedium),
         ],
       ),
     );

@@ -38,11 +38,16 @@ class JournalSummaryCard extends StatelessWidget {
     required this.entry,
     required this.accent,
     required this.tint,
+    this.showDate = true,
   });
 
   final JournalEntry entry;
   final Color accent;
   final Color tint;
+
+  /// When false the date line ("6월 29일 월요일") is hidden and only the time
+  /// is shown — used where a section header already states the date.
+  final bool showDate;
 
   @override
   Widget build(BuildContext context) {
@@ -82,16 +87,19 @@ class JournalSummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: showDate
+                      ? MainAxisAlignment.spaceBetween
+                      : MainAxisAlignment.start,
                   children: [
-                    Text(
-                      formatEntryDate(entry.createdAt),
-                      style: AppTextStyles.labelMedium.copyWith(
-                        letterSpacing: 0,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
+                    if (showDate)
+                      Text(
+                        formatEntryDate(entry.createdAt),
+                        style: AppTextStyles.labelMedium.copyWith(
+                          letterSpacing: 0,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.onSurface,
+                        ),
                       ),
-                    ),
                     Text(
                       formatEntryTime(entry.createdAt),
                       style: AppTextStyles.labelMedium.copyWith(
