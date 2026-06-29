@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mental_stone_ui/mental_stone_ui.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../router/app_router.dart';
 
@@ -82,7 +83,10 @@ class EmotionSynthesisScreen extends StatelessWidget {
                     variant: GlassButtonVariant.glass,
                     pill: true,
                     expand: true,
-                    onPressed: () {},
+                    onPressed: () => Share.share(
+                      '새로운 감정 스톤이 탄생했어요.\n'
+                      '행복 64% · 기대 36%\n\n— Mental Stone',
+                    ),
                   ),
                 ],
               ),

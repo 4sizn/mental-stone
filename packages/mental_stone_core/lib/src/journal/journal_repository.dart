@@ -33,6 +33,19 @@ class JournalRepository {
     return JournalEntry.fromMap(row);
   }
 
+  Future<JournalEntry> update(String id, {String? mood, String? body}) async {
+    final patch = <String, dynamic>{};
+    if (mood != null) patch['mood'] = mood;
+    if (body != null) patch['body'] = body;
+    final row = await _client
+        .from('journal_entries')
+        .update(patch)
+        .eq('id', id)
+        .select()
+        .single();
+    return JournalEntry.fromMap(row);
+  }
+
   Future<void> delete(String id) async {
     await _client.from('journal_entries').delete().eq('id', id);
   }

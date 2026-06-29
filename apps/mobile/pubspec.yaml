@@ -20,6 +20,9 @@ dependencies:
   # Backend
   supabase_flutter: ^2.5.0
 
+  # Sharing
+  share_plus: ^10.0.0
+
   # Workspace packages
   mental_stone_ui:
     path: ../../packages/mental_stone_ui

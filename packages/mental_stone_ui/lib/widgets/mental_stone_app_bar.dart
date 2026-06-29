@@ -16,6 +16,7 @@ class MentalStoneAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onLeading,
     this.avatarUrl,
     this.onAvatarTap,
+    this.actions,
   });
 
   // Kept for API compatibility with the previous bar; no longer rendered.
@@ -26,6 +27,10 @@ class MentalStoneAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onLeading;
   final String? avatarUrl;
   final VoidCallback? onAvatarTap;
+
+  /// Trailing controls shown on the right (e.g. edit / delete on detail
+  /// screens). Rendered after the spacer, alongside the back button.
+  final List<Widget>? actions;
 
   @override
   Size get preferredSize => const Size.fromHeight(52);
@@ -53,6 +58,11 @@ class MentalStoneAppBar extends StatelessWidget implements PreferredSizeWidget {
               const Spacer(),
               if (showAvatar)
                 _AvatarButton(url: avatarUrl, onTap: onAvatarTap ?? onLeading),
+              if (actions != null)
+                for (final action in actions!) ...[
+                  const SizedBox(width: 8),
+                  action,
+                ],
             ],
           ),
         ),

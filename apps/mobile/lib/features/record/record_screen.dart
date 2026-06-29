@@ -6,17 +6,25 @@ import 'package:mental_stone_ui/mental_stone_ui.dart';
 
 import '../../router/app_router.dart';
 
-/// Screen 03 — Record (write a new entry). Persists to Supabase and then
-/// continues to the analysis flow.
+/// Screen 03 — Record. Writes a new entry (then continues to the analysis
+/// flow), or edits an existing [entry] in place when one is passed.
 class RecordScreen extends ConsumerStatefulWidget {
-  const RecordScreen({super.key});
+  const RecordScreen({super.key, this.entry});
+
+  /// When non-null the screen runs in edit mode: it preloads this entry's
+  /// body, saves with `update`, and pops back instead of starting analysis.
+  final JournalEntry? entry;
+
   @override
   ConsumerState<RecordScreen> createState() => _RecordScreenState();
 }
 
 class _RecordScreenState extends ConsumerState<RecordScreen> {
-  final _controller = TextEditingController();
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.entry?.body ?? '');
   bool _saving = false;
+
+  bool get _isEditing => widget.entry != null;
 
   @override
   void dispose() {
@@ -37,11 +45,16 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
 
     setState(() => _saving = true);
     try {
-      await ref
-          .read(journalRepositoryProvider)
-          .create(userId: user.id, body: text);
-      ref.invalidate(journalEntriesProvider);
-      if (mounted) context.push(Routes.analysis);
+      final repo = ref.read(journalRepositoryProvider);
+      if (_isEditing) {
+        await repo.update(widget.entry!.id, body: text);
+        ref.invalidate(journalEntriesProvider);
+        if (mounted) context.pop();
+      } else {
+        await repo.create(userId: user.id, body: text);
+        ref.invalidate(journalEntriesProvider);
+        if (mounted) context.push(Routes.analysis);
+      }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -72,10 +85,13 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('지금 이 순간', style: AppTextStyles.labelMedium),
+                Text(
+                  _isEditing ? '기록 수정' : '지금 이 순간',
+                  style: AppTextStyles.labelMedium,
+                ),
                 const SizedBox(height: AppSpacing.stackSm),
                 Text(
-                  '당신의 감정을\n돌에 담아보세요.',
+                  _isEditing ? '내용을\n다듬어 보세요.' : '당신의 감정을\n돌에 담아보세요.',
                   style: AppTextStyles.headlineLargeMobile,
                 ),
                 const SizedBox(height: AppSpacing.stackLg),
@@ -100,7 +116,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                 40,
               ),
               child: GlassButton(
-                label: '기록 완료',
+                label: _isEditing ? '수정 완료' : '기록 완료',
                 icon: Icons.done_all,
                 variant: GlassButtonVariant.glass,
                 pill: true,
