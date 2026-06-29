@@ -211,6 +211,9 @@ class _MonthGrid extends StatelessWidget {
     // weekday: 1=Mon..7=Sun → S-first grid offset (Sun=0).
     final leadBlanks = DateTime(year, month, 1).weekday % 7;
     final count = entriesByDay.values.fold<int>(0, (s, l) => s + l.length);
+    // One stone per day that has a record (matches the colored day cells);
+    // a day with several records still shows a single stone.
+    final stones = entriesByDay.length;
 
     final cells = <Widget>[
       for (var i = 0; i < leadBlanks; i++) const SizedBox.shrink(),
@@ -272,23 +275,9 @@ class _MonthGrid extends StatelessWidget {
           const SizedBox(height: AppSpacing.stackMd),
           const Divider(color: Color(0x33FFFFFF), height: 1),
           const SizedBox(height: AppSpacing.stackMd),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('총 $count개의 감정 수집', style: AppTextStyles.labelMedium),
-              const SizedBox(
-                width: 56,
-                height: 24,
-                child: Stack(
-                  children: [
-                    Positioned(left: 0, child: _Dot(AppColors.tertiary)),
-                    Positioned(left: 16, child: _Dot(AppColors.secondary)),
-                    Positioned(left: 32, child: _Dot(AppColors.primary)),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          _StatRow(label: '이번달 감정 기록', value: '$count개'),
+          const SizedBox(height: AppSpacing.stackSm),
+          _StatRow(label: '이번달 스톤 수집', value: '$stones개'),
         ],
       ),
     );
@@ -354,20 +343,28 @@ class _DayCell extends StatelessWidget {
   }
 }
 
-/// One of the small overlapping mood dots in the "감정 수집" summary.
-class _Dot extends StatelessWidget {
-  const _Dot(this.color);
-  final Color color;
+/// One summary line under the calendar grid: a left label and a right value.
+class _StatRow extends StatelessWidget {
+  const _StatRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
   @override
-  Widget build(BuildContext context) => Container(
-    width: 24,
-    height: 24,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: color,
-      border: Border.all(color: Colors.white, width: 1.5),
-    ),
-  );
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: AppTextStyles.labelMedium),
+        Text(
+          value,
+          style: AppTextStyles.labelMedium.copyWith(
+            color: AppColors.onSurface,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Year + month picker shown when the calendar header is tapped. Years are
