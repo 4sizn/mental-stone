@@ -68,7 +68,7 @@ class EmotionSynthesisScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.stackLg),
                   GlassButton(
-                    label: '도감에 보관하기',
+                    label: '보관하기',
                     icon: Icons.auto_awesome,
                     variant: GlassButtonVariant.glass,
                     pill: true,

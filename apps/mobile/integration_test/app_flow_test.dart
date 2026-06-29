@@ -92,7 +92,7 @@ void main() {
 
     // Store the stone → back home, then open the Calendar tab and confirm the
     // entry created above shows up there.
-    final vault = find.text('도감에 보관하기');
+    final vault = find.text('보관하기');
     if (vault.evaluate().isNotEmpty) {
       await tester.ensureVisible(vault);
       await pumpFor(tester, const Duration(milliseconds: 400));
