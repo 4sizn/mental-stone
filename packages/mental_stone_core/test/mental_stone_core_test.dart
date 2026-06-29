@@ -70,4 +70,32 @@ void main() {
       expect(p.createdAt?.year, 2026);
     });
   });
+
+  group('entriesByDayOfMonth', () {
+    JournalEntry entryOn(DateTime when) =>
+        JournalEntry(id: when.toIso8601String(), userId: 'u', createdAt: when);
+
+    test('buckets by day and excludes other months', () {
+      final entries = [
+        entryOn(DateTime(2026, 6, 28, 9)),
+        entryOn(DateTime(2026, 6, 28, 18)),
+        entryOn(DateTime(2026, 6, 29, 10)),
+        entryOn(DateTime(2026, 5, 29, 10)), // other month
+        entryOn(DateTime(2026, 7, 1, 10)), // other month
+      ];
+      final byDay = entriesByDayOfMonth(entries, 2026, 6);
+      expect(byDay.keys.toSet(), {28, 29});
+      expect(byDay[28]!.length, 2);
+      expect(byDay[29]!.length, 1);
+    });
+
+    test('returns empty map when nothing matches', () {
+      final byDay = entriesByDayOfMonth(
+        [entryOn(DateTime(2026, 5, 1))],
+        2026,
+        6,
+      );
+      expect(byDay, isEmpty);
+    });
+  });
 }

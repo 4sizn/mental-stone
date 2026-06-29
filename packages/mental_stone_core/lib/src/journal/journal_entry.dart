@@ -29,3 +29,22 @@ class JournalEntry {
     );
   }
 }
+
+/// Groups [entries] by day-of-month for the given [year]/[month], comparing in
+/// local time. Shared by the Home and Calendar tabs so both bucket a day's
+/// entries identically. Entry order within a day is preserved (the provider
+/// already sorts newest-first).
+Map<int, List<JournalEntry>> entriesByDayOfMonth(
+  Iterable<JournalEntry> entries,
+  int year,
+  int month,
+) {
+  final byDay = <int, List<JournalEntry>>{};
+  for (final e in entries) {
+    final d = e.createdAt.toLocal();
+    if (d.year == year && d.month == month) {
+      (byDay[d.day] ??= <JournalEntry>[]).add(e);
+    }
+  }
+  return byDay;
+}

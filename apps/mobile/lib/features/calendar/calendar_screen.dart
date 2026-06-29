@@ -79,17 +79,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               child: Text('기록을 불러오지 못했어요.', style: AppTextStyles.bodyMedium),
             ),
             data: (entries) {
-              final monthEntries = entries.where((e) {
-                final d = e.createdAt.toLocal();
-                return d.year == _month.year && d.month == _month.month;
-              }).toList();
-
               // day → that day's entries (newest first, as the provider sorts).
-              final entriesByDay = <int, List<JournalEntry>>{};
-              for (final e in monthEntries) {
-                final day = e.createdAt.toLocal().day;
-                (entriesByDay[day] ??= <JournalEntry>[]).add(e);
-              }
+              final entriesByDay = entriesByDayOfMonth(
+                entries,
+                _month.year,
+                _month.month,
+              );
 
               // The list is always a single day. Default (only computed when
               // the user hasn't tapped a day):

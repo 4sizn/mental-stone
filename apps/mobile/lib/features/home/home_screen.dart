@@ -32,13 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final entries = entriesAsync.valueOrNull ?? const <JournalEntry>[];
 
     // day → that day's entries (newest first, as the provider sorts them).
-    final entriesByDay = <int, List<JournalEntry>>{};
-    for (final e in entries) {
-      final d = e.createdAt.toLocal();
-      if (d.year == now.year && d.month == now.month) {
-        (entriesByDay[d.day] ??= <JournalEntry>[]).add(e);
-      }
-    }
+    final entriesByDay = entriesByDayOfMonth(entries, now.year, now.month);
     final selectedEntries = entriesByDay[_selectedDay];
 
     return Scaffold(
